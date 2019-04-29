@@ -1,7 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
-import scalaz.zio.Task
+import scalaz.zio.{DefaultRuntime, Task}
 
 final class IOSyntaxSafeOps[A](a: => A) {
   def failWith(err: AppError): Task[A] =
@@ -20,9 +20,11 @@ trait ToIOSyntaxSafeOps {
 
 ////
 
-final class IOSyntaxSafeOpsTask[A](io: Task[A]) {
-  def unsafeRunSync(): Either[Throwable, A] =
-    ??? // TODO
+final class IOSyntaxSafeOpsTask[A](io: Task[A]) extends DefaultRuntime {
+  def runSync(): Either[Throwable, A] =
+    unsafeRunSync(io)
+      .toEither // TODO - this wraps in FiberFailure
+
 }
 
 trait ToIOSyntaxSafeOpsTask {

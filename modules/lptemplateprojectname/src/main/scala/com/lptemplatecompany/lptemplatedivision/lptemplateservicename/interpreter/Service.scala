@@ -1,16 +1,15 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter
 
-import scalaz.zio.{Task, ZIO}
-import scalaz.zio.duration.Duration
-import scalaz.zio.interop.catz._
 import cats.effect.Resource
-import cats.syntax.apply._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import io.chrisdavenport.log4cats.Logger
+import scalaz.zio.Task
 import scalaz.zio.clock.Clock
+import scalaz.zio.duration.Duration
+import scalaz.zio.interop.catz._
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -42,7 +41,6 @@ import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
-import cats.syntax.functor._
 import cats.syntax.monadError._
 
 object FileSystem
@@ -73,7 +71,7 @@ object FileSystem
     delete(new File(filepath))
       .failWithMsg(s"Could not delete $filepath")
       .ensure(AppError.DirectoryDeleteFailed(filepath))(identity)
-      .void
+      .unit
 
   def createTempDir[A]: Task[String] =
     for {

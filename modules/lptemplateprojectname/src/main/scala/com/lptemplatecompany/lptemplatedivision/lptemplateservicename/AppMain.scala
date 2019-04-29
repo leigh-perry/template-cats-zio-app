@@ -17,27 +17,20 @@ object AppMain
   private def getLogger: Task[Logger[Task]] =
     Slf4jLogger.create[Task]
 
-  import org.slf4j.LoggerFactory
-
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-  //    Slf4jLogger.create[Task]
-  //      .flatMap(
-  //        log =>
-  //          program
-  //            .tapBoth(
-  //              e => log.error(s"Application failed: $e"),
-  //              _ => log.info("Application terminated with no error indication")
-  //            )
-  //            .fold(_ => 1, _ => 0)
-  //      )
-
-  // TODO handle error in Slf4jLogger.create[Task] (above)
-    program
-      .tapBoth(
-        e => Task(LoggerFactory.getLogger(getClass).error(s"Application failed: $e")),
-        _ => Task(LoggerFactory.getLogger(getClass).info("Application terminated with no error indication"))
+    Slf4jLogger.create[Task]
+      .flatMap(
+        log =>
+          program
+            .tapBoth(
+              e => log.error(s"Application failed: $e"),
+              _ => log.info("Application terminated with no error indication")
+            )
+            .fold(_ => 1, _ => 0)
       )
-      .fold(_ => 1, _ => 0)
+      .either
+      .map(_.fold(e => 1, identity))
+
 
   private def program: Task[Unit] =
     for {

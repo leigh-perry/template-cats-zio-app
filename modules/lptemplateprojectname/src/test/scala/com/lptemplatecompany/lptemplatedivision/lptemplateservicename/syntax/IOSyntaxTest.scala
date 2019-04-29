@@ -17,7 +17,7 @@ object IOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWithMsg(s"message $v")
-          .unsafeRunSync()
+          .runSync()
           .shouldSatisfy {
             case Left(AppError.ExceptionEncountered(s)) => {
               s.contains("RuntimeException") &&
@@ -33,7 +33,7 @@ object IOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWith(DirectoryDeleteFailed(v))
-          .unsafeRunSync()
+          .runSync()
           .shouldBe(DirectoryDeleteFailed(v).asLeft)
     }
   }
@@ -42,7 +42,7 @@ object IOSyntaxTest
     check1 {
       v: Int =>
         v.failWithMsg(s"message $v")
-          .unsafeRunSync()
+          .runSync()
           .shouldBe(v.asRight)
     }
   }
