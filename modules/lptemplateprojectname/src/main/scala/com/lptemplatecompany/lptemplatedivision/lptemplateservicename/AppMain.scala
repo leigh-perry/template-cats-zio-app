@@ -18,7 +18,7 @@ object AppMain
     Slf4jLogger.create[Task]
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-    Slf4jLogger.create[Task]
+    getLogger
       .flatMap(
         log =>
           program
