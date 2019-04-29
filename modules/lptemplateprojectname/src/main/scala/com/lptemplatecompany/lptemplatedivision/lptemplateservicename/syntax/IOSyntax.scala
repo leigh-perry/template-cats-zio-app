@@ -1,12 +1,13 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
-import scalaz.zio.{DefaultRuntime, Task}
+import scalaz.zio.Exit.{Failure, Success}
+import scalaz.zio.{DefaultRuntime, FiberFailure, Task}
 
 final class IOSyntaxSafeOps[A](a: => A) {
   def failWith(err: AppError): Task[A] =
     Task(a)
-      .mapError(t => err)
+      .mapError(_ => err)
 
   def failWithMsg(message: String): Task[A] =
     Task(a)
@@ -22,8 +23,11 @@ trait ToIOSyntaxSafeOps {
 
 final class IOSyntaxSafeOpsTask[A](io: Task[A]) extends DefaultRuntime {
   def runSync(): Either[Throwable, A] =
-    unsafeRunSync(io)
-      .toEither // TODO - this wraps in FiberFailure
+      //.toEither // TODO - this wraps in FiberFailure
+    unsafeRunSync(io) match {
+      case Success(value) => Right(value)
+      case Failure(cause) => Left(cause.squash)
+    }
 
 }
 
