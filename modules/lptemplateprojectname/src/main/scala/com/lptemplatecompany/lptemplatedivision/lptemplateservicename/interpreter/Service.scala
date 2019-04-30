@@ -21,7 +21,6 @@ class Service private(cfg: Config, log: Logger[Task], tempDir: String)
 
   override def run: Task[Unit] =
     log.info(s"Starting in $tempDir") *>
-      //ZIO.sleep(Duration.fromScala(10.seconds)).unit <*
       Clock.Live.clock.sleep(Duration.fromScala(10.seconds)) <*
       log.info(s"Finishing in $tempDir")
 

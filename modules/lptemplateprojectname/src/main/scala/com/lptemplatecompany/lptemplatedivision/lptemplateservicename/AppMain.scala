@@ -29,7 +29,7 @@ object AppMain
             .fold(_ => 1, _ => 0)
       )
       .either
-      .map(_.fold(e => 1, identity))
+      .map(_.fold(_ => 1, identity))
 
 
   private def program: Task[Unit] =

@@ -25,7 +25,7 @@ object AppError {
 
   implicit val showAppError: Show[AppError] =
     Show.show {
-      (t: AppError) => {
+      t: AppError => {
         val extra: String =
           t match {
             case InvalidConfiguration(errors) => errors.show

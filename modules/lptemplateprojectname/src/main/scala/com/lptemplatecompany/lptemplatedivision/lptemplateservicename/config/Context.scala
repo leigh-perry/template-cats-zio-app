@@ -3,7 +3,7 @@ package config
 
 import scalaz.zio.Task
 import scalaz.zio.interop.catz._
-import cats.effect.{Resource}
+import cats.effect.Resource
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
 import io.chrisdavenport.log4cats.Logger

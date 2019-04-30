@@ -4,7 +4,7 @@ package config
 import cats.Monad
 import scalaz.zio.Task
 import scalaz.zio.interop.catz._
-import cats.effect.{Resource}
+import cats.effect.Resource
 import cats.syntax.contravariantSemigroupal._
 import cats.syntax.either._
 import cats.syntax.functor._
