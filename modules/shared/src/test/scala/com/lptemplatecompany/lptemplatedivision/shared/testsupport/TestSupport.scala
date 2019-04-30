@@ -1,9 +1,11 @@
 package com.lptemplatecompany.lptemplatedivision.shared.testsupport
 
 import cats.Eq
+import cats.syntax.either._
 import cats.syntax.eq._
 import minitest.api.Asserts
 import org.scalacheck.Gen
+import scalaz.zio.{DefaultRuntime, Task}
 
 import scala.language.implicitConversions
 
@@ -85,10 +87,25 @@ trait TestSupportGens {
 
 ////
 
+final class IOSyntaxSafeOpsTaskTesting[A](t: Task[A]) extends DefaultRuntime {
+  def runSync(): Either[Throwable, A] =
+    unsafeRunSync(t)
+      .fold(_.squash.asLeft, _.asRight)
+
+}
+
+trait ToIOSyntaxSafeOpsTaskTesting {
+  implicit def implToIOSyntaxSafeOpsTaskTesting[A](t: Task[A]): IOSyntaxSafeOpsTaskTesting[A] =
+    new IOSyntaxSafeOpsTaskTesting[A](t)
+}
+
+////
+
 trait TestSupport
   extends ToTestSupportOps
     with ToTestSupportEqOps
     with TestSupportGens
+    with ToIOSyntaxSafeOpsTaskTesting
 
 object testsupportinstances
   extends TestSupport

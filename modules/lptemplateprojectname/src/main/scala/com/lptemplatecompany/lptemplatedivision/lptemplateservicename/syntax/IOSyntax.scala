@@ -1,8 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
 
-import cats.syntax.either._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
-import scalaz.zio.{DefaultRuntime, Task}
+import scalaz.zio.{IO, Task}
 
 final class IOSyntaxSafeOps[A](a: => A) {
   def failWith(err: AppError): Task[A] =
@@ -15,22 +14,20 @@ final class IOSyntaxSafeOps[A](a: => A) {
 }
 
 trait ToIOSyntaxSafeOps {
-  implicit def ops[A](a: => A): IOSyntaxSafeOps[A] =
+  implicit def implToIOSyntaxSafeOps[A](a: => A): IOSyntaxSafeOps[A] =
     new IOSyntaxSafeOps[A](a)
 }
 
 ////
 
-final class IOSyntaxSafeOpsTask[A](io: Task[A]) extends DefaultRuntime {
-  def runSync(): Either[Throwable, A] =
-    unsafeRunSync(io)
-      .fold(_.squash.asLeft, _.asRight)
-
+final class IOSyntaxSafeOpsTask[A](t: Task[A]) {
+  def asIO: IO[AppError, A] =
+    t.mapError(AppError.exception(_))
 }
 
 trait ToIOSyntaxSafeOpsTask {
-  implicit def ops[A](io: Task[A]): IOSyntaxSafeOpsTask[A] =
-    new IOSyntaxSafeOpsTask[A](io)
+  implicit def implToIOSyntaxSafeOpsTask[A](t: Task[A]): IOSyntaxSafeOpsTask[A] =
+    new IOSyntaxSafeOpsTask[A](t)
 }
 
 ////

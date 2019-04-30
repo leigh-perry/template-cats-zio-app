@@ -20,6 +20,9 @@ object AppError {
   final case class ExceptionEncountered(message: String) extends AppError
   final case class DirectoryDeleteFailed(dir: String) extends AppError
 
+  def exception(e: Throwable): AppError =
+    ExceptionEncountered(s"Exception: ${Apps.stackTrace(e)}")
+
   def exception(message: String, e: Throwable): AppError =
     ExceptionEncountered(s"Exception $message: ${Apps.stackTrace(e)}")
 
