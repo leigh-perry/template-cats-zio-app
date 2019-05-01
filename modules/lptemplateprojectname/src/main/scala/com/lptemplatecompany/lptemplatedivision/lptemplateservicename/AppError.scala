@@ -7,7 +7,7 @@ import cats.syntax.show._
 import com.leighperry.conduction.config.ConfiguredError
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 
-sealed trait AppError extends Throwable {
+sealed trait AppError {
   override def toString: String =
     this.show
 }

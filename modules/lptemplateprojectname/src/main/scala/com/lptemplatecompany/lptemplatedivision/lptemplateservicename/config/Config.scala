@@ -2,13 +2,14 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import cats.Monad
-import scalaz.zio.Task
-import scalaz.zio.interop.catz._
-import cats.effect.Resource
+import cats.data.NonEmptyChain
 import cats.syntax.contravariantSemigroupal._
 import cats.syntax.either._
 import cats.syntax.functor._
-import com.leighperry.conduction.config.{Configured, Conversion, Environment}
+import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import scalaz.zio.interop.catz._
+import scalaz.zio.{Managed, Task}
 
 
 /**
@@ -18,22 +19,28 @@ final case class Config(
   kafka: KafkaConfig,
 )
 
-object Config {
+object Config
+  extends IOSyntax {
 
   implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, Config] =
     Configured[F, KafkaConfig].withSuffix("KAFKA")
       .map(Config.apply)
 
-  def load: Task[Config] =
-    for {
-      env <- Environment.fromEnvVars[Task]
-      logenv <- Environment.logging[Task](env, Environment.printer)
-      cio <- Configured[Task, Config]("LPTEMPLATESERVICENAME").run(logenv)
-      result <- Task.fromEither(cio.toEither.leftMap(AppError.InvalidConfiguration))
-    } yield result
+  def load: AIO[Config] = {
+    val task: Task[Either[NonEmptyChain[ConfiguredError], Config]] =
+      for {
+        env <- Environment.fromEnvVars[Task]
+        logenv <- Environment.logging[Task](env, Environment.printer)
+        cio <- Configured[Task, Config]("LPTEMPLATESERVICENAME").run(logenv)
+      } yield cio.toEither
 
-  def resource: Resource[Task, Config] =
-    Resource.liftF(load)
+    task.map(_.leftMap(AppError.InvalidConfiguration))
+      .asIO
+      .absolve
+  }
+
+  def resource: Managed[AppError, Config] =
+    Managed.fromEffect(load)
 
   val defaults: Config =
     Config(

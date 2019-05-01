@@ -1,15 +1,13 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
-import scalaz.zio.Task
-import scalaz.zio.interop.catz._
-import cats.effect.Resource
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
 import io.chrisdavenport.log4cats.Logger
+import scalaz.zio.Managed
 
 /**
-  * Top level application resources held in a Resource[...] so that proper cleanup happens
+  * Top level application resources held in a Managed[...] so that proper cleanup happens
   * on program termination, whether clean or failure.
   */
 final case class Context[F[_]] private(
@@ -17,8 +15,8 @@ final case class Context[F[_]] private(
 )
 
 object Context {
-  def create(cfg: Config, log: Logger[Task]): Resource[Task, Context[Task]] =
+  def create(cfg: Config, log: Logger[AIO]): Managed[AppError, Context[AIO]] =
     for {
       service <- Service.resource(cfg, log)
-    } yield new Context[Task](service)
+    } yield new Context[AIO](service)
 }

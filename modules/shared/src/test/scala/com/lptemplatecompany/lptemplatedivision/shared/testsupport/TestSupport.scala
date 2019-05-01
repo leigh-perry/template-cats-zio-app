@@ -5,7 +5,7 @@ import cats.syntax.either._
 import cats.syntax.eq._
 import minitest.api.Asserts
 import org.scalacheck.Gen
-import scalaz.zio.{DefaultRuntime, Task}
+import scalaz.zio.{DefaultRuntime, IO, ZIO}
 
 import scala.language.implicitConversions
 
@@ -87,16 +87,21 @@ trait TestSupportGens {
 
 ////
 
-final class IOSyntaxSafeOpsTaskTesting[A](t: Task[A]) extends DefaultRuntime {
-  def runSync(): Either[Throwable, A] =
+final class IOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A]) extends DefaultRuntime {
+  def runSync(): Either[List[E], A] =
     unsafeRunSync(t)
-      .fold(_.squash.asLeft, _.asRight)
+      .fold(
+        _.fold(List[E]()) {
+          case (errors, cause) => errors ++ cause.failures
+        }.asLeft,
+        _.asRight
+      )
 
 }
 
 trait ToIOSyntaxSafeOpsTaskTesting {
-  implicit def implToIOSyntaxSafeOpsTaskTesting[A](t: Task[A]): IOSyntaxSafeOpsTaskTesting[A] =
-    new IOSyntaxSafeOpsTaskTesting[A](t)
+  implicit def implToIOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A]): IOSyntaxSafeOpsTaskTesting[E, A] =
+    new IOSyntaxSafeOpsTaskTesting[E, A](t)
 }
 
 ////
