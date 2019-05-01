@@ -46,18 +46,16 @@ object FileSystem
   extends IOSyntax {
 
   def tempDirectoryScope(log: Logger[AIO]): Managed[AppError, String] =
-    Managed.make {
+    IOApps.managed(
       for {
         file <- FileSystem.createTempDir
         _ <- log.info(s"Created temp directory $file")
       } yield file
-    } {
+    )(
       dir =>
-        val cleanup: IO[AppError, Unit] =
-          FileSystem.deleteFileOrDirectory(dir) *>
-            log.info(s"Removed temp directory $dir")
-        cleanup.safely
-    }
+        FileSystem.deleteFileOrDirectory(dir) *>
+          log.info(s"Removed temp directory $dir")
+    )
 
   def tempFilename(extension: Option[String]): AIO[String] =
     UUID.randomUUID.toString
