@@ -12,9 +12,7 @@ sealed trait AppError {
     this.show
 }
 
-/**
-  * The ADT of error types for the application. IO requires a Throwable subclass.
-  */
+/** The ADT of error types for the application */
 object AppError {
   final case class InvalidConfiguration(errors: NonEmptyChain[ConfiguredError]) extends AppError
   final case class ExceptionEncountered(message: String) extends AppError

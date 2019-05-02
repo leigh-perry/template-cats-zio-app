@@ -1,7 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package syntax
 
-import scalaz.zio.{IO, Task, UIO}
+import scalaz.zio.{Task, UIO}
 
 final class IOSyntaxSafeOps[A](a: => A) {
   def failWith(err: AppError): AIO[A] =
@@ -44,22 +44,9 @@ trait ToIOSyntaxSafeOpsUIO {
 
 ////
 
-final class IOSyntaxSafeOpsIO[E](io: IO[E, Unit]) {
-  def safely: UIO[Unit] =
-    io.catchAll(e => IO.succeedLazy(println(s"PANIC: $e")))
-}
-
-trait ToIOSyntaxSafeOpsIO {
-  implicit def implToIOSyntaxSafeOpsIO[E](io: IO[E, Unit]): IOSyntaxSafeOpsIO[E] =
-    new IOSyntaxSafeOpsIO[E](io)
-}
-
-////
-
 trait IOSyntax
   extends ToIOSyntaxSafeOps
     with ToIOSyntaxSafeOpsTask
-    with ToIOSyntaxSafeOpsIO
 
-object aiosyntaxinstances
+object iosyntaxinstances
   extends IOSyntax

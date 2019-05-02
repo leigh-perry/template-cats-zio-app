@@ -2,14 +2,17 @@ package com.lptemplatecompany.lptemplatedivision
 package lptemplateservicename
 package interpreter
 
+import java.util.concurrent.atomic.AtomicReference
+
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import io.chrisdavenport.log4cats.Logger
 import scalaz.zio.clock.Clock
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed}
+import scalaz.zio.{IO, Managed, Task, ZIO}
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -46,7 +49,7 @@ object FileSystem
   extends IOSyntax {
 
   def tempDirectoryScope(log: Logger[AIO]): Managed[AppError, String] =
-    IOApps.managed(
+    Apps.managed(
       for {
         file <- FileSystem.createTempDir
         _ <- log.info(s"Created temp directory $file")
