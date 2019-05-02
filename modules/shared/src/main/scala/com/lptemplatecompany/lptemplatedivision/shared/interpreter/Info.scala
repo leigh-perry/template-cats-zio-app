@@ -10,7 +10,7 @@ import cats.syntax.functor._
 import cats.syntax.traverse._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.BuildInfo
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
-import io.chrisdavenport.log4cats.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 
 /**
   * The real-infrastructure implementation for logging of application information, typically at

@@ -11,7 +11,6 @@ object Dependencies {
     val zio = "1.0-RC4"
 
     val logback = "1.2.3"
-    val log4cats = "0.3.0"
     val conduction = "0.1.1"
     
     val minitest = "2.4.0"
@@ -25,7 +24,6 @@ object Dependencies {
   val ziocats = "org.scalaz" %% "scalaz-zio-interop-cats" % Version.zio
 
   val logback = "ch.qos.logback" % "logback-classic" % Version.logback
-  val log4catsSlf4j = "io.chrisdavenport" %% "log4cats-slf4j" % Version.log4cats
   val conduction = "com.github.leigh-perry" %% "conduction" % Version.conduction
 
   val minitest = "io.monix" %% "minitest" % Version.minitest

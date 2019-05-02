@@ -2,17 +2,15 @@ package com.lptemplatecompany.lptemplatedivision
 package lptemplateservicename
 package interpreter
 
-import java.util.concurrent.atomic.AtomicReference
-
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
-import io.chrisdavenport.log4cats.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.clock.Clock
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed, Task, ZIO}
+import scalaz.zio.{IO, Managed}
 
 /**
   * The real-infrastructure implementation for the top level service

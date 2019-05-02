@@ -3,7 +3,7 @@ package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
-import io.chrisdavenport.log4cats.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.Managed
 
 /**

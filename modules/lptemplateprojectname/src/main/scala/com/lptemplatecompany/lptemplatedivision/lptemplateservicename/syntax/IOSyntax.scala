@@ -21,7 +21,7 @@ trait ToIOSyntaxSafeOps {
 ////
 
 final class IOSyntaxSafeOpsTask[A](t: Task[A]) {
-  def asIO: AIO[A] =
+  def asAIO: AIO[A] =
     t.mapError(e => AppError.exception(e))
 }
 
@@ -32,8 +32,9 @@ trait ToIOSyntaxSafeOpsTask {
 
 ////
 
+// TODO remove
 final class IOSyntaxSafeOpsUIO[A](u: UIO[A]) {
-  def asIO: AIO[A] =
+  def asAIO: AIO[A] =
     u
 }
 

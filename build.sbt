@@ -37,7 +37,6 @@ lazy val shared =
         zio,
         ziocats,
         logback,
-        log4catsSlf4j,
         conduction,
         minitest % "test",
         minitestLaws % "test",

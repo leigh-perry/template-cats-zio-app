@@ -35,7 +35,7 @@ object Config
       } yield cio.toEither
 
     task.map(_.leftMap(AppError.InvalidConfiguration))
-      .asIO
+      .asAIO
       .absolve
   }
 
