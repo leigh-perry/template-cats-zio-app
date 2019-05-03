@@ -87,7 +87,9 @@ trait TestSupportGens {
 
 ////
 
-final class IOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A]) extends DefaultRuntime {
+final class IOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A])
+  extends DefaultRuntime {
+
   def runSync(): Either[List[E], A] =
     unsafeRunSync(t)
       .fold(

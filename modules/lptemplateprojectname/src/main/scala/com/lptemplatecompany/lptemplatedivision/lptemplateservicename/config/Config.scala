@@ -9,7 +9,7 @@ import cats.syntax.functor._
 import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import scalaz.zio.interop.catz._
-import scalaz.zio.{Managed, Task}
+import scalaz.zio.{Task, ZManaged}
 
 
 /**
@@ -39,8 +39,9 @@ object Config
       .absolve
   }
 
-  def resource: Managed[AppError, Config] =
-    Managed.fromEffect(load)
+  // TODO remove
+  def managed: ZManaged[AppEnv, AppError, Config] =
+    ZManaged.fromEffect(load)
 
   val defaults: Config =
     Config(

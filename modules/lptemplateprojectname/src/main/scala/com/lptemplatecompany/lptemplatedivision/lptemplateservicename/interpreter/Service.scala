@@ -10,7 +10,7 @@ import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.clock.Clock
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed}
+import scalaz.zio.{IO, Managed, ZManaged}
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -28,7 +28,7 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
 }
 
 object Service {
-  def resource(cfg: Config, log: Logger[AIO]): Managed[AppError, ServiceAlg[AIO]] =
+  def resource(cfg: Config, log: Logger[AIO]): ZManaged[AppEnv, AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
       svc <- Managed.fromEffect(AIO(new Service(cfg, log, tempDir): ServiceAlg[AIO]))
@@ -46,7 +46,7 @@ import cats.syntax.monadError._
 object FileSystem
   extends IOSyntax {
 
-  def tempDirectoryScope(log: Logger[AIO]): Managed[AppError, String] =
+  def tempDirectoryScope(log: Logger[AIO]): ZManaged[AppEnv, AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir

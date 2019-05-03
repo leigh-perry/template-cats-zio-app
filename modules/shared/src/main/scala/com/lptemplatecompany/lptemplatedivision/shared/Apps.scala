@@ -3,7 +3,7 @@ package shared
 
 import java.io.{PrintWriter, StringWriter}
 
-import scalaz.zio.{IO, Managed}
+import scalaz.zio.{IO, Managed, ZIO, ZManaged}
 
 object Apps
   extends GenIOSyntax {
@@ -28,7 +28,7 @@ object Apps
 
 
   /** Handle the need for `release` action to be error-free (UIO) */
-  def managed[E, A](acquire: IO[E, A])(release: A => IO[E, Unit]): Managed[E, A] =
-    Managed.make(acquire)(release(_).safely)
+  def managed[R, E, A](acquire: ZIO[R, E, A])(release: A => ZIO[R, E, Unit]): ZManaged[R, E, A] =
+    ZManaged.make(acquire)(release(_).safely)
 
 }
