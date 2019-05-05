@@ -1,8 +1,14 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import scalaz.zio.blocking.Blocking
+import scalaz.zio.clock.Clock
+import scalaz.zio.console.Console
 import scalaz.zio.interop.catz._
+import scalaz.zio.random.Random
+import scalaz.zio.system.System
 import scalaz.zio.{UIO, ZIO}
 
 
@@ -38,3 +44,7 @@ object appenv {
     ZIO.accessM(_.appEnv.logger)
 }
 
+/** Overall environment for ZIO application */
+trait RuntimeEnv
+  extends AppEnv
+    with Clock with Console with System with Random with Blocking

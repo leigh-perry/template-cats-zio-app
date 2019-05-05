@@ -3,7 +3,7 @@ package lptemplateservicename
 package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger

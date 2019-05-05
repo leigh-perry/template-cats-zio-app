@@ -1,6 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
