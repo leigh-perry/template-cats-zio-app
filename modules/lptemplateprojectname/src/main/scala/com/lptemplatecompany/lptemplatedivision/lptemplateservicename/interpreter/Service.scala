@@ -7,10 +7,9 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Co
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.clock.Clock
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed, ZManaged}
+import scalaz.zio.{IO, Managed, ZManaged, clock}
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -22,18 +21,17 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
 
   override def run: AIO[Unit] =
     log.info(s"Starting in $tempDir") *> {
-      appenv.config *>
-      appenv.config *>
-      appenv.config *>
-      Clock.Live.clock.sleep(Duration.fromScala(2.seconds))
+      appenv.config *> // TODO memoize config
+        appenv.config *>
+        appenv.config *>
+        clock.sleep(Duration.fromScala(2.seconds))
     } <*
       log.info(s"Finishing in $tempDir")
 
 }
 
 object Service {
-  // TODO rename
-  def resource(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
+  def managed(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
       svc <- Managed.fromEffect(AIO(new Service(cfg, log, tempDir): ServiceAlg[AIO]))

@@ -5,28 +5,28 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Co
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.blocking.Blocking
 import scalaz.zio.clock.Clock
-import scalaz.zio.console.Console
 import scalaz.zio.interop.catz._
-import scalaz.zio.random.Random
-import scalaz.zio.system.System
 import scalaz.zio.{App, ZIO}
 
 /** Overall environment for ZIO application */
 trait RuntimeEnv
   extends AppEnv
-    with Clock with Console with System with Random with Blocking
+    with Clock
+// with Console
+// with System
+// with Random
+// with Blocking
 
 object RuntimeEnv {
   object Live
     extends RuntimeEnv
       with appenv.AppEnv.Live
       with Clock.Live
-      with Console.Live
-      with System.Live
-      with Random.Live
-      with Blocking.Live
+  // with Console.Live
+  // with System.Live
+  // with Random.Live
+  // with Blocking.Live
 }
 
 ////
