@@ -3,7 +3,7 @@ package lptemplateservicename
 package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
@@ -14,7 +14,7 @@ import scalaz.zio.{IO, Managed, ZManaged, clock}
 /**
   * The real-infrastructure implementation for the top level service
   */
-class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
+class Service private(log: Logger[AIO], tempDir: String)
   extends ServiceAlg[AIO] {
 
   import scala.concurrent.duration.DurationInt
@@ -31,10 +31,10 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
 }
 
 object Service {
-  def managed(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
+  def managed(log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
-      svc <- Managed.fromEffect(AIO(new Service(cfg, log, tempDir): ServiceAlg[AIO]))
+      svc <- Managed.fromEffect(AIO(new Service(log, tempDir): ServiceAlg[AIO]))
     } yield svc
 }
 

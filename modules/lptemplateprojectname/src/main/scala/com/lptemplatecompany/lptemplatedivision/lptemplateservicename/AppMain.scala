@@ -26,11 +26,11 @@ object AppMain
       info <- Info.of[AIO, Config](cfg, log)
       _ <- info.logEnvironment
       _ <- log.info(cfg.toString)
-      outcome <- runApp(cfg, log)
+      outcome <- runApp(log)
     } yield outcome
 
-  private def runApp(cfg: Config, log: Logger[AIO]): AIO[Unit] =
-    Context.create(cfg, log)
+  private def runApp(log: Logger[AIO]): AIO[Unit] =
+    Context.create(log)
       .use {
         ctx =>
           ctx.service.run

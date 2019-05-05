@@ -16,8 +16,8 @@ final case class Context[F[_]] private(
 )
 
 object Context {
-  def create(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, Context[AIO]] =
+  def create(log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, Context[AIO]] =
     for {
-      service <- Service.managed(cfg, log)
+      service <- Service.managed(log)
     } yield new Context[AIO](service)
 }

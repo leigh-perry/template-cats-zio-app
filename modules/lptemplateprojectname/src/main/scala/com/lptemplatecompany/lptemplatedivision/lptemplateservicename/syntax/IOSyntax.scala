@@ -1,7 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package syntax
 
-import scalaz.zio.{Task, UIO}
+import scalaz.zio.Task
 
 final class IOSyntaxSafeOps[A](a: => A) {
   def failWith(err: AppError): AIO[A] =
@@ -28,19 +28,6 @@ final class IOSyntaxSafeOpsTask[A](t: Task[A]) {
 trait ToIOSyntaxSafeOpsTask {
   implicit def implToIOSyntaxSafeOpsTask[A](t: Task[A]): IOSyntaxSafeOpsTask[A] =
     new IOSyntaxSafeOpsTask[A](t)
-}
-
-////
-
-// TODO remove
-final class IOSyntaxSafeOpsUIO[A](u: UIO[A]) {
-  def asAIO: AIO[A] =
-    u
-}
-
-trait ToIOSyntaxSafeOpsUIO {
-  implicit def implToIOSyntaxSafeOpsUIO[A](u: UIO[A]): IOSyntaxSafeOpsUIO[A] =
-    new IOSyntaxSafeOpsUIO[A](u)
 }
 
 ////
