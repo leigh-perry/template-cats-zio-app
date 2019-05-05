@@ -3,7 +3,7 @@ package lptemplateservicename
 package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
@@ -22,14 +22,19 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
   import scala.concurrent.duration.DurationInt
 
   override def run: AIO[Unit] =
-    log.info(s"Starting in $tempDir") *>
-      Clock.Live.clock.sleep(Duration.fromScala(2.seconds)) <*
+    log.info(s"Starting in $tempDir") *> {
+      appenv.config *>
+      appenv.config *>
+      appenv.config *>
+      Clock.Live.clock.sleep(Duration.fromScala(2.seconds))
+    } <*
       log.info(s"Finishing in $tempDir")
 
 }
 
 object Service {
-  def resource(cfg: Config, log: Logger[AIO]): ZManaged[AppEnv, AppError, ServiceAlg[AIO]] =
+  // TODO rename
+  def resource(cfg: Config, log: Logger[AIO]): ZManaged[AppEnvType, AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
       svc <- Managed.fromEffect(AIO(new Service(cfg, log, tempDir): ServiceAlg[AIO]))
@@ -47,7 +52,7 @@ import cats.syntax.monadError._
 object FileSystem
   extends IOSyntax {
 
-  def tempDirectoryScope(log: Logger[AIO]): ZManaged[AppEnv, AppError, String] =
+  def tempDirectoryScope(log: Logger[AIO]): ZManaged[AppEnvType, AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir

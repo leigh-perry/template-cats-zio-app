@@ -52,11 +52,12 @@ object Env extends Console.Live with Logger.Live with KVStore.Live
 object Main extends App {
   type AppType = Console with Logger with KVStore
 
-  val program: ZIO[AppType, AppError, Unit] = for {
-    key <- getStrLn.orDie
-    value <- valueOf(key)
-    _ <- info(s"$key -> $value")
-  } yield ()
+  val program: ZIO[AppType, AppError, Unit] =
+    for {
+      key <- getStrLn.orDie
+      value <- valueOf(key)
+      _ <- info(s"$key -> $value")
+    } yield ()
 
   def run(args: List[String]): ZIO[Environment, Nothing, Int] =
     program.provide(Env).fold(
@@ -75,52 +76,4 @@ object MainSpec {
     val kvStore: KVStore.Service = ???
   }
   // Main.program.provide(testEnv) をテストするコードいろいろ
-}
-
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////
-
-import scalaz.zio.{App, IO, ZIO}
-
-import scala.io.StdIn
-
-//  "org.scalaz" %% "scalaz-zio" % "1.0-RC3"
-
-object SimpleMain extends App {
-  sealed trait AppError
-  case object NoValue extends AppError
-
-  def valueOf(key: String): ZIO[Map[String, String], AppError, String] =
-    ZIO.accessM {
-      env =>
-        ZIO.fromEither(env.get(key).toRight(NoValue))
-    }
-
-  val program: ZIO[Map[String, String], AppError, Unit] =
-    for {
-      key <- IO.effectTotal(StdIn.readLine())
-      v <- valueOf(key)
-      _ <- IO.effectTotal(println(v))
-    } yield ()
-
-  def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
-    val value: ZIO[Any, Nothing, Int] =
-      program.provide(Map("42" -> "Foo"))
-        .fold(_ => 1, _ => 0)
-
-    value
-  }
-}
-
-object MyApp extends App {
-
-  def run(args: List[String]): ZIO[Console, Nothing, Int] =
-    myAppLogic.fold(_ => 1, _ => 0)
-
-  val myAppLogic: ZIO[Console, Nothing, Unit] =
-    for {
-      _ <- putStrLn("Hello! What is your name?")
-    } yield ()
 }

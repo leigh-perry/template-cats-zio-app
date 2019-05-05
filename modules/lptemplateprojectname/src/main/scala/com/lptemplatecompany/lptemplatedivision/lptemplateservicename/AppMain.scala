@@ -16,7 +16,7 @@ object AppMain
     with IOSyntax {
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-    program.provide(appenv.AppEnv.live)
+    program.provide(appenv.AppEnv.Live)
       .fold(_ => 1, _ => 0)
 
   private def program: AIO[Unit] =
