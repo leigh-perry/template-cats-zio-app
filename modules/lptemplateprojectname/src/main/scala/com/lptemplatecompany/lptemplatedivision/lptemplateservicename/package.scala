@@ -1,5 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision
 
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.RuntimeEnv
 import scalaz.zio.{IO, ZIO}
 
 package object lptemplateservicename {

@@ -1,35 +1,11 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.clock.Clock
 import scalaz.zio.interop.catz._
 import scalaz.zio.{App, ZIO}
-
-/** Overall environment for ZIO application */
-trait RuntimeEnv
-  extends AppEnv
-    with Clock
-// with Console
-// with System
-// with Random
-// with Blocking
-
-object RuntimeEnv {
-  object Live
-    extends RuntimeEnv
-      with appenv.AppEnv.Live
-      with Clock.Live
-  // with Console.Live
-  // with System.Live
-  // with Random.Live
-  // with Blocking.Live
-}
-
-////
 
 /**
   * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
