@@ -5,7 +5,7 @@ import scalaz.zio.{IO, Task, ZIO}
 final class GenIOSyntaxSafeOps[R, E](op: => Unit) {
   def safely: ZIO[R, Nothing, Unit] =
     Task(op)
-      .catchAll(e => ZIO.succeedLazy(println(s"PANIC: $e")))
+      .catchAll[R, Nothing, Unit](e => ZIO.succeedLazy(println(s"PANIC: $e")))
 }
 
 trait ToGenIOSyntaxSafeOps {

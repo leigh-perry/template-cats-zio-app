@@ -5,7 +5,7 @@ import cats.syntax.applicative._
 import cats.syntax.either._
 import cats.syntax.functor._
 
-trait Logger[F[_]] {
+trait Logger[+F[_]] {
   def error(message: => String): F[Unit]
   def warn(message: => String): F[Unit]
   def info(message: => String): F[Unit]

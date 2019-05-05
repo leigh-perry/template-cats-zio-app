@@ -9,7 +9,7 @@ import cats.syntax.functor._
 import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import scalaz.zio.interop.catz._
-import scalaz.zio.{Task, ZManaged}
+import scalaz.zio.{IO, Task}
 
 
 /**
@@ -26,7 +26,7 @@ object Config
     Configured[F, KafkaConfig].withSuffix("KAFKA")
       .map(Config.apply)
 
-  def load: AIO[Config] = {
+  def load: IO[AppError, Config] = {
     val task: Task[Either[NonEmptyChain[ConfiguredError], Config]] =
       for {
         env <- Environment.fromEnvVars[Task]
@@ -35,13 +35,9 @@ object Config
       } yield cio.toEither
 
     task.map(_.leftMap(AppError.InvalidConfiguration))
-      .asAIO
+      .mapError(e => AppError.exception(e))
       .absolve
   }
-
-  // TODO remove
-  def managed: ZManaged[AppEnv, AppError, Config] =
-    ZManaged.fromEffect(load)
 
   val defaults: Config =
     Config(

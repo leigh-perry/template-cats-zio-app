@@ -3,6 +3,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
 import cats.syntax.either._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError.DirectoryDeleteFailed
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.stub.appenvTest
 import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
 import minitest.SimpleTestSuite
 import minitest.laws.Checkers
@@ -17,7 +18,7 @@ object IOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWithMsg(s"message $v")
-          .runSync()
+          .runSync(appenvTest.Test)
           .shouldSatisfy {
             case Left(List(AppError.ExceptionEncountered(s))) =>
               s.contains("RuntimeException") &&
@@ -32,7 +33,7 @@ object IOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWith(DirectoryDeleteFailed(v))
-          .runSync()
+          .runSync(appenvTest.Test)
           .shouldBe(List(DirectoryDeleteFailed(v)).asLeft)
     }
   }
@@ -41,7 +42,7 @@ object IOSyntaxTest
     check1 {
       v: Int =>
         v.failWithMsg(s"message $v")
-          .runSync()
+          .runSync(appenvTest.Test)
           .shouldBe(v.asRight)
     }
   }
