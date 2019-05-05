@@ -1,6 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
@@ -12,16 +13,13 @@ import scalaz.zio.random.Random
 import scalaz.zio.system.System
 import scalaz.zio.{App, ZIO}
 
-/**
-  * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
-  * required. This is implemented using `cats.effect.Resource`.
-  */
-object AppMain
-  extends App
-    with IOSyntax {
+/** Overall environment for ZIO application */
+trait RuntimeEnv
+  extends AppEnv
+    with Clock with Console with System with Random with Blocking
 
-  //extends Console.Live with Logger.Live with KVStore.Live
-  object RuntimeEnvLive
+object RuntimeEnv {
+  object Live
     extends RuntimeEnv
       with appenv.AppEnv.Live
       with Clock.Live
@@ -29,9 +27,20 @@ object AppMain
       with System.Live
       with Random.Live
       with Blocking.Live
+}
+
+////
+
+/**
+  * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
+  * required. This is implemented using `zio.Managed`.
+  */
+object AppMain
+  extends App
+    with IOSyntax {
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-    program.provide(RuntimeEnvLive)
+    program.provide(RuntimeEnv.Live)
       .fold(_ => 1, _ => 0)
 
   private def program: AIO[Unit] =

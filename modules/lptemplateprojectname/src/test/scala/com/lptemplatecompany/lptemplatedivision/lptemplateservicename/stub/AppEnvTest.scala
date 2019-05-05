@@ -1,8 +1,8 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.stub
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AIO
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, RuntimeEnv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.{AIO, RuntimeEnv}
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.blocking.Blocking
 import scalaz.zio.clock.Clock
