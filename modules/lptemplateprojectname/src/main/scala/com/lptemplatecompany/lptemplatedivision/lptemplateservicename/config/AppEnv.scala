@@ -2,12 +2,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.blocking.Blocking
-import scalaz.zio.clock.Clock
-import scalaz.zio.console.Console
 import scalaz.zio.interop.catz._
-import scalaz.zio.random.Random
-import scalaz.zio.system.System
 import scalaz.zio.{UIO, ZIO}
 
 
@@ -34,11 +29,6 @@ object appenv {
 
     object Live
       extends Live
-        with Clock.Live
-        with Console.Live
-        with System.Live
-        with Random.Live
-        with Blocking.Live
   }
 
   def config: AIO[Config] =

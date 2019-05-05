@@ -4,7 +4,6 @@ package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, appenv}
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
@@ -34,7 +33,7 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
 
 object Service {
   // TODO rename
-  def resource(cfg: Config, log: Logger[AIO]): ZManaged[AppEnvType, AppError, ServiceAlg[AIO]] =
+  def resource(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
       svc <- Managed.fromEffect(AIO(new Service(cfg, log, tempDir): ServiceAlg[AIO]))
@@ -52,7 +51,7 @@ import cats.syntax.monadError._
 object FileSystem
   extends IOSyntax {
 
-  def tempDirectoryScope(log: Logger[AIO]): ZManaged[AppEnvType, AppError, String] =
+  def tempDirectoryScope(log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir

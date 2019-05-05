@@ -1,6 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.stub
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AIO
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.{AIO, RuntimeEnv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
@@ -24,7 +24,8 @@ object appenvTest {
   }
 
   object Test
-    extends Test
+    extends RuntimeEnv
+      with Test
       with Clock.Live
       with Console.Live
       with System.Live

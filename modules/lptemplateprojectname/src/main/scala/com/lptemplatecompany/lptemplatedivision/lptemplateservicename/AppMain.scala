@@ -4,7 +4,12 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Co
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import scalaz.zio.blocking.Blocking
+import scalaz.zio.clock.Clock
+import scalaz.zio.console.Console
 import scalaz.zio.interop.catz._
+import scalaz.zio.random.Random
+import scalaz.zio.system.System
 import scalaz.zio.{App, ZIO}
 
 /**
@@ -15,8 +20,18 @@ object AppMain
   extends App
     with IOSyntax {
 
+  //extends Console.Live with Logger.Live with KVStore.Live
+  object RuntimeEnvLive
+    extends RuntimeEnv
+      with appenv.AppEnv.Live
+      with Clock.Live
+      with Console.Live
+      with System.Live
+      with Random.Live
+      with Blocking.Live
+
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-    program.provide(appenv.AppEnv.Live)
+    program.provide(RuntimeEnvLive)
       .fold(_ => 1, _ => 0)
 
   private def program: AIO[Unit] =

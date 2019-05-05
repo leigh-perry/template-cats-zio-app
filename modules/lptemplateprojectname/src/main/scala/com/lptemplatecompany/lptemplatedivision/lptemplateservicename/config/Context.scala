@@ -2,7 +2,6 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.ZManaged
@@ -17,7 +16,7 @@ final case class Context[F[_]] private(
 )
 
 object Context {
-  def create(cfg: Config, log: Logger[AIO]): ZManaged[AppEnvType, AppError, Context[AIO]] =
+  def create(cfg: Config, log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, Context[AIO]] =
     for {
       service <- Service.resource(cfg, log)
     } yield new Context[AIO](service)
