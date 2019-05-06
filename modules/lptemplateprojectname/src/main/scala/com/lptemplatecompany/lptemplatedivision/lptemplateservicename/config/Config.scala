@@ -8,8 +8,8 @@ import cats.syntax.either._
 import cats.syntax.functor._
 import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import scalaz.zio.Task
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Task}
 
 
 /**
@@ -26,7 +26,7 @@ object Config
     Configured[F, KafkaConfig].withSuffix("KAFKA")
       .map(Config.apply)
 
-  def load: IO[AppError, Config] = {
+  def load: AIO[Config] = {
     val task: Task[Either[NonEmptyChain[ConfiguredError], Config]] =
       for {
         env <- Environment.fromEnvVars[Task]

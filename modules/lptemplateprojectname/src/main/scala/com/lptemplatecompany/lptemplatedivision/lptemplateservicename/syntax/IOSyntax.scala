@@ -4,11 +4,11 @@ package syntax
 import scalaz.zio.Task
 
 final class IOSyntaxSafeOps[A](a: => A) {
-  def failWith(err: AppError): AIO[A] =
+  def failWith(err: AppError): RAIO[A] =
     Task(a)
       .mapError(_ => err)
 
-  def failWithMsg(message: String): AIO[A] =
+  def failWithMsg(message: String): RAIO[A] =
     Task(a)
       .mapError(AppError.exception(message, _))
 }

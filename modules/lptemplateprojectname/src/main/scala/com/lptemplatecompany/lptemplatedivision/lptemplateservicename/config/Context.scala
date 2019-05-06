@@ -15,8 +15,8 @@ final case class Context[F[_]] private(
 )
 
 object Context {
-  def create: ZManaged[RuntimeEnv, AppError, Context[AIO]] =
+  def create: ZManaged[RuntimeEnv, AppError, Context[RAIO]] =
     for {
       service <- Service.managed
-    } yield new Context[AIO](service)
+    } yield new Context[RAIO](service)
 }

@@ -19,10 +19,10 @@ object appenv {
   ////
 
   // shortcuts
-  def config: AIO[Config] =
+  def config: RAIO[Config] =
     ZIO.accessM(_.appEnv.config)
 
-  def logger: AIO[Logger[UIO]] =
+  def logger: RAIO[Logger[UIO]] =
     ZIO.accessM(_.appEnv.logger)
 
   ////

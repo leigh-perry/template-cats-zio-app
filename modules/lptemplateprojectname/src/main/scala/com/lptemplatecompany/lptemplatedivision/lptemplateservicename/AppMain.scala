@@ -5,7 +5,7 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interprete
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.interop.catz._
-import scalaz.zio.{App, IO, UIO, ZIO}
+import scalaz.zio.{App, UIO, ZIO}
 
 /**
   * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
@@ -23,14 +23,14 @@ object AppMain
     * To prevent repeated evaluation of environmental dependencies, pre-compute them and
     * build services from these instances
     */
-  private def resolvedProgram: IO[AppError, Unit] =
+  private def resolvedProgram: AIO[Unit] =
     for {
       cfg <- Config.load
       log <- Logger.slf4j[UIO]
       resolved <- program.provide(RuntimeEnv.live(appenv.service(cfg, log)))
     } yield resolved
 
-  private def program: AIO[Unit] =
+  private def program: RAIO[Unit] =
     for {
       cfg <- appenv.config
       log <- appenv.logger
@@ -40,7 +40,7 @@ object AppMain
       outcome <- runApp(log)
     } yield outcome
 
-  private def runApp(log: Logger[UIO]): AIO[Unit] =
+  private def runApp(log: Logger[UIO]): RAIO[Unit] =
     Context.create
       .use {
         ctx =>

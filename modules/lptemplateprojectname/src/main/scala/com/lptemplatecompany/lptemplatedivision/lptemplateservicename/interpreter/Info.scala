@@ -18,23 +18,23 @@ import scalaz.zio.interop.catz._
   * C = config class
   */
 class Info
-  extends InfoAlg[AIO] {
+  extends InfoAlg[RAIO] {
 
   import scala.collection.JavaConverters._
 
-  override def systemProperties: AIO[Map[String, String]] =
-    System.getProperties.asScala.toMap.pure[AIO]
+  override def systemProperties: RAIO[Map[String, String]] =
+    System.getProperties.asScala.toMap.pure[RAIO]
 
-  override def environmentVariables: AIO[Map[String, String]] =
-    System.getenv.asScala.toMap.pure[AIO]
+  override def environmentVariables: RAIO[Map[String, String]] =
+    System.getenv.asScala.toMap.pure[RAIO]
 
-  override def logBanner: AIO[Unit] =
+  override def logBanner: RAIO[Unit] =
     for {
       log <- appenv.logger
       r <- log.info(banner)
     } yield r
 
-  override def logMap(m: Map[String, String]): AIO[Unit] =
+  override def logMap(m: Map[String, String]): RAIO[Unit] =
     for {
       log <- appenv.logger
       r <- m.toList
@@ -43,20 +43,20 @@ class Info
         .unit
     } yield r
 
-  override def logConfig: AIO[Unit] =
+  override def logConfig: RAIO[Unit] =
     for {
       log <- appenv.logger
       cfg <- appenv.config
       r <- log.info(s"Configuration $cfg")
     } yield r
 
-  override def logSeparator: AIO[Unit] =
+  override def logSeparator: RAIO[Unit] =
     for {
       log <- appenv.logger
       r <- log.info(separator)
     } yield r
 
-  override def logTitle(title: String): AIO[Unit] =
+  override def logTitle(title: String): RAIO[Unit] =
     for {
       log <- appenv.logger
       r <- log.info(title)
@@ -85,6 +85,6 @@ class Info
 }
 
 object Info {
-  def of: AIO[Info] =
-    AIO(new Info)
+  def of: RAIO[Info] =
+    RAIO(new Info)
 }

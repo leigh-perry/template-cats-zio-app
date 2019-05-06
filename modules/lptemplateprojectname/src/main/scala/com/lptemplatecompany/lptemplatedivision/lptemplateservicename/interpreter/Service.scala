@@ -15,11 +15,11 @@ import scalaz.zio.{IO, Managed, UIO, ZManaged, clock}
   * The real-infrastructure implementation for the top level service
   */
 class Service private(tempDir: String)
-  extends ServiceAlg[AIO] {
+  extends ServiceAlg[RAIO] {
 
   import scala.concurrent.duration.DurationInt
 
-  override def run: AIO[Unit] =
+  override def run: RAIO[Unit] =
     for {
       log <- appenv.logger
       r <- log.info(s"Starting in $tempDir")
@@ -30,11 +30,11 @@ class Service private(tempDir: String)
 }
 
 object Service {
-  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
+  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[RAIO]] =
     for {
       log <- Managed.fromEffect(appenv.logger)
       tempDir <- FileSystem.tempDirectoryScope(log)
-      svc <- Managed.fromEffect(AIO(new Service(tempDir): ServiceAlg[AIO]))
+      svc <- Managed.fromEffect(RAIO(new Service(tempDir): ServiceAlg[RAIO]))
     } yield svc
 }
 
@@ -61,22 +61,22 @@ object FileSystem
           log.info(s"Removed temp directory $dir")
     )
 
-  def tempFilename(extension: Option[String]): AIO[String] =
+  def tempFilename(extension: Option[String]): RAIO[String] =
     UUID.randomUUID.toString
       .failWithMsg("UUID.randomUUID failed")
       .map(name => extension.fold(name)(ext => s"$name.$ext"))
 
-  def baseTempDir: AIO[String] =
+  def baseTempDir: RAIO[String] =
     System.getProperty("java.io.tmpdir")
       .failWithMsg("Could not get tmpdir")
 
-  def deleteFileOrDirectory(filepath: String): AIO[Unit] =
+  def deleteFileOrDirectory(filepath: String): RAIO[Unit] =
     delete(new File(filepath))
       .failWithMsg(s"Could not delete $filepath")
       .ensure(AppError.DirectoryDeleteFailed(filepath))(identity)
       .unit
 
-  def createTempDir[A]: AIO[String] =
+  def createTempDir[A]: RAIO[String] =
     for {
       base <- baseTempDir
       parent <- IO.succeed(Path.of(base))
