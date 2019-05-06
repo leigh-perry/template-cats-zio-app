@@ -9,7 +9,7 @@ import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed, ZManaged, clock}
+import scalaz.zio.{IO, Managed, UIO, ZManaged, clock}
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -49,7 +49,7 @@ import cats.syntax.monadError._
 object FileSystem
   extends IOSyntax {
 
-  def tempDirectoryScope(log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, String] =
+  def tempDirectoryScope(log: Logger[UIO]): ZManaged[RuntimeEnv, AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir

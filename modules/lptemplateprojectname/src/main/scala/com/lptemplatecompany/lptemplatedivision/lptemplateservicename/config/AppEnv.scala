@@ -11,8 +11,8 @@ object appenv {
 
   object AppEnv {
     trait Service {
-      def config: AIO[Config]
-      def logger: AIO[Logger[AIO]]
+      def config: UIO[Config]
+      def logger: UIO[Logger[UIO]]
     }
   }
 
@@ -22,16 +22,16 @@ object appenv {
   def config: AIO[Config] =
     ZIO.accessM(_.appEnv.config)
 
-  def logger: AIO[Logger[AIO]] =
+  def logger: AIO[Logger[UIO]] =
     ZIO.accessM(_.appEnv.logger)
 
   ////
 
   def service(cfg: Config, log: Logger[UIO]): AppEnv.Service =
     new AppEnv.Service {
-      override def config: AIO[Config] =
-        AIO(cfg)
-      override def logger: AIO[Logger[AIO]] =
-        AIO(log)
+      override def config: UIO[Config] =
+        UIO(cfg)
+      override def logger: UIO[Logger[UIO]] =
+        UIO(log)
     }
 }

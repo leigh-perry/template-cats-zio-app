@@ -40,7 +40,7 @@ object AppMain
       outcome <- runApp(log)
     } yield outcome
 
-  private def runApp(log: Logger[AIO]): AIO[Unit] =
+  private def runApp(log: Logger[UIO]): AIO[Unit] =
     Context.create
       .use {
         ctx =>
