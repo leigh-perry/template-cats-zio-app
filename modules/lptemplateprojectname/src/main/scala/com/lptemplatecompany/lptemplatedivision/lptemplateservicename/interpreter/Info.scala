@@ -1,16 +1,15 @@
-package com.lptemplatecompany.lptemplatedivision.shared
+package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package interpreter
 
-import cats.Monad
 import cats.instances.list._
 import cats.instances.order._
 import cats.instances.string._
 import cats.syntax.applicative._
-import cats.syntax.functor._
 import cats.syntax.traverse._
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.BuildInfo
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv
+import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import scalaz.zio.interop.catz._
 
 /**
   * The real-infrastructure implementation for logging of application information, typically at
@@ -18,34 +17,50 @@ import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
   *
   * C = config class
   */
-class Info[F[_] : Monad, C](cfg: C, log: Logger[F])
-  extends InfoAlg[F] {
+class Info
+  extends InfoAlg[AIO] {
 
   import scala.collection.JavaConverters._
 
-  override def systemProperties: F[Map[String, String]] =
-    System.getProperties.asScala.toMap.pure[F]
+  override def systemProperties: AIO[Map[String, String]] =
+    System.getProperties.asScala.toMap.pure[AIO]
 
-  override def environmentVariables: F[Map[String, String]] =
-    System.getenv.asScala.toMap.pure[F]
+  override def environmentVariables: AIO[Map[String, String]] =
+    System.getenv.asScala.toMap.pure[AIO]
 
-  override def logBanner: F[Unit] =
-    log.info(banner)
+  override def logBanner: AIO[Unit] =
+    for {
+      log <- appenv.logger
+      r <- log.info(banner)
+    } yield r
 
-  override def logMap(m: Map[String, String]): F[Unit] =
-    m.toList
-      .sortBy(_._1)
-      .traverse(e => log.info(formatMapEntry(e)))
-      .void
+  override def logMap(m: Map[String, String]): AIO[Unit] =
+    for {
+      log <- appenv.logger
+      r <- m.toList
+        .sortBy(_._1)
+        .traverse(e => log.info(formatMapEntry(e)))
+        .unit
+    } yield r
 
-  override def logConfig: F[Unit] =
-    log.info(s"Configuration $cfg")
+  override def logConfig: AIO[Unit] =
+    for {
+      log <- appenv.logger
+      cfg <- appenv.config
+      r <- log.info(s"Configuration $cfg")
+    } yield r
 
-  override def logSeparator: F[Unit] =
-    log.info(separator)
+  override def logSeparator: AIO[Unit] =
+    for {
+      log <- appenv.logger
+      r <- log.info(separator)
+    } yield r
 
-  override def logTitle(title: String): F[Unit] =
-    log.info(title)
+  override def logTitle(title: String): AIO[Unit] =
+    for {
+      log <- appenv.logger
+      r <- log.info(title)
+    } yield r
 
   private val banner =
     s"""${Apps.className(this)} process version: ${BuildInfo.version}
@@ -70,7 +85,6 @@ class Info[F[_] : Monad, C](cfg: C, log: Logger[F])
 }
 
 object Info {
-  def of[F[_] : Monad, C](cfg: C, log: Logger[F]): F[Info[F, C]] =
-    new Info(cfg, log)
-      .pure[F]
+  def of: AIO[Info] =
+    AIO(new Info)
 }

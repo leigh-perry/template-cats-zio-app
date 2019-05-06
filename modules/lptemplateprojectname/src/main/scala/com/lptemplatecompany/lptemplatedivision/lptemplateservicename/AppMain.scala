@@ -1,8 +1,8 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Context, RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
-import com.lptemplatecompany.lptemplatedivision.shared.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.interop.catz._
 import scalaz.zio.{App, ZIO}
@@ -23,14 +23,14 @@ object AppMain
     for {
       cfg <- appenv.config
       log <- appenv.logger
-      info <- Info.of[AIO, Config](cfg, log)
+      info <- Info.of
       _ <- info.logEnvironment
       _ <- log.info(cfg.toString)
       outcome <- runApp(log)
     } yield outcome
 
   private def runApp(log: Logger[AIO]): AIO[Unit] =
-    Context.create(log)
+    Context.create
       .use {
         ctx =>
           ctx.service.run

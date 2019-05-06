@@ -14,27 +14,31 @@ import scalaz.zio.{IO, Managed, ZManaged, clock}
 /**
   * The real-infrastructure implementation for the top level service
   */
-class Service private(log: Logger[AIO], tempDir: String)
+class Service private(tempDir: String)
   extends ServiceAlg[AIO] {
 
   import scala.concurrent.duration.DurationInt
 
   override def run: AIO[Unit] =
-    log.info(s"Starting in $tempDir") *> {
-      appenv.config *> // TODO memoize config
-        appenv.config *>
-        appenv.config *>
-        clock.sleep(Duration.fromScala(2.seconds))
-    } <*
-      log.info(s"Finishing in $tempDir")
+    for {
+      log <- appenv.logger
+      r <- log.info(s"Starting in $tempDir") *> {
+        appenv.config *> // TODO memoize config
+          appenv.config *>
+          appenv.config *>
+          clock.sleep(Duration.fromScala(2.seconds))
+      } <*
+        log.info(s"Finishing in $tempDir")
+    } yield r
 
 }
 
 object Service {
-  def managed(log: Logger[AIO]): ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
+  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[AIO]] =
     for {
+      log <- Managed.fromEffect(appenv.logger)
       tempDir <- FileSystem.tempDirectoryScope(log)
-      svc <- Managed.fromEffect(AIO(new Service(log, tempDir): ServiceAlg[AIO]))
+      svc <- Managed.fromEffect(AIO(new Service(tempDir): ServiceAlg[AIO]))
     } yield svc
 }
 
