@@ -22,13 +22,9 @@ class Service private(tempDir: String)
   override def run: AIO[Unit] =
     for {
       log <- appenv.logger
-      r <- log.info(s"Starting in $tempDir") *> {
-        appenv.config *> // TODO memoize config
-          appenv.config *>
-          appenv.config *>
-          clock.sleep(Duration.fromScala(2.seconds))
-      } <*
-        log.info(s"Finishing in $tempDir")
+      r <- log.info(s"Starting in $tempDir")
+      _ <- clock.sleep(Duration.fromScala(2.seconds))
+      _ <- log.info(s"Finishing in $tempDir")
     } yield r
 
 }
