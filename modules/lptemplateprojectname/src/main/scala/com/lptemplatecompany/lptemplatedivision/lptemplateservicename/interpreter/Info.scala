@@ -14,8 +14,6 @@ import scalaz.zio.interop.catz._
 /**
   * The real-infrastructure implementation for logging of application information, typically at
   * application startup
-  *
-  * C = config class
   */
 class Info
   extends InfoAlg[RAIO] {
