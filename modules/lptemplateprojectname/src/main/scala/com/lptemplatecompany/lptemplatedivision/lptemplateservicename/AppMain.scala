@@ -1,6 +1,5 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
@@ -20,11 +19,15 @@ object AppMain
     resolvedProgram
       .fold(_ => 1, _ => 0)
 
+  /**
+    * To prevent repeated evaluation of environmental dependencies, pre-compute them and
+    * build services from these instances
+    */
   private def resolvedProgram: IO[AppError, Unit] =
     for {
       cfg <- Config.load
       log <- Logger.slf4j[UIO]
-      resolved <- program.provide(RuntimeEnv.live(appEnvService(cfg, log)))
+      resolved <- program.provide(RuntimeEnv.live(appenv.service(cfg, log)))
     } yield resolved
 
   private def program: AIO[Unit] =
@@ -46,13 +49,5 @@ object AppMain
       e => log.error(s"Application failed: $e"),
       _ => log.info("Application terminated with no error indication")
     )
-
-  private def appEnvService(cfg: Config, log: Logger[UIO]): AppEnv.Service =
-    new AppEnv.Service {
-      override def config: AIO[Config] =
-        AIO(cfg)
-      override def logger: AIO[Logger[AIO]] =
-        AIO(log)
-    }
 
 }
