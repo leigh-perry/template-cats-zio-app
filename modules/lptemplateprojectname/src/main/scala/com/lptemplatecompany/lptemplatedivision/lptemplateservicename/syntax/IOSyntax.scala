@@ -10,7 +10,7 @@ final class IOSyntaxSafeOps[A](a: => A) {
 
   def failWithMsg(message: String): AIO[A] =
     Task(a)
-      .mapError(t => AppError.exception(message, t))
+      .mapError(AppError.exception(message, _))
 }
 
 trait ToIOSyntaxSafeOps {
@@ -22,7 +22,7 @@ trait ToIOSyntaxSafeOps {
 
 final class IOSyntaxSafeOpsTask[A](t: Task[A]) {
   def asAIO: AIO[A] =
-    t.mapError(e => AppError.exception(e))
+    t.mapError(AppError.exception(_))
 }
 
 trait ToIOSyntaxSafeOpsTask {
