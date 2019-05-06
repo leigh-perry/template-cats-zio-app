@@ -5,6 +5,7 @@ import scalaz.zio.{IO, ZIO}
 
 package object lptemplateservicename {
 
+  /** Application IO */
   type AIO[A] = ZIO[RuntimeEnv, AppError, A]
 
   object AIO {

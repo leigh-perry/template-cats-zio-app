@@ -1,4 +1,5 @@
-package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config
+package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
+package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import scalaz.zio.clock.Clock
@@ -13,10 +14,12 @@ trait RuntimeEnv
 // with Blocking
 
 object RuntimeEnv {
-  object Live
-    extends RuntimeEnv
-      with appenv.AppEnv.Live
-      with Clock.Live
+  def live(service: AppEnv.Service): RuntimeEnv with Clock.Live =
+    new RuntimeEnv
+      with Clock.Live {
+      override val appEnv =
+        service
+    }
   // with Console.Live
   // with System.Live
   // with Random.Live
