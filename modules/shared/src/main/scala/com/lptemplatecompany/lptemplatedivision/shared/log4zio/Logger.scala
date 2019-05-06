@@ -1,9 +1,8 @@
 package com.lptemplatecompany.lptemplatedivision.shared.log4zio
 
-import cats.syntax.applicative._
-import cats.syntax.either._
-import cats.syntax.functor._
-import cats.{Applicative, Monad}
+import cats.Applicative
+import cats.effect.Sync
+import cats.implicits._
 
 trait Logger[+F[_]] {
   def error(message: => String): F[Unit]
@@ -13,8 +12,8 @@ trait Logger[+F[_]] {
 }
 
 object Logger {
-  def slf4j[F[_] : Monad]: F[Logger[F]] =
-    Applicative[F].pure(org.slf4j.LoggerFactory.getLogger(getClass))
+  def slf4j[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
+    Sync[G].delay(org.slf4j.LoggerFactory.getLogger(getClass))
       .map {
         slf =>
           new Logger[F] {

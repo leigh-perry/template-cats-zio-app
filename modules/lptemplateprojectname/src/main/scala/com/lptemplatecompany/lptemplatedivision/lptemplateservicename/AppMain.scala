@@ -5,7 +5,7 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interprete
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.interop.catz._
-import scalaz.zio.{App, UIO, ZIO}
+import scalaz.zio.{App, Task, UIO, ZIO}
 
 /**
   * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
@@ -26,7 +26,7 @@ object AppMain
   private def resolvedProgram: AIO[Unit] =
     for {
       cfg <- Config.load
-      log <- Logger.slf4j[UIO]
+      log <- Logger.slf4j[UIO, Task].asAIO
       resolved <- program.provide(RuntimeEnv.live(appenv.service(cfg, log)))
     } yield resolved
 

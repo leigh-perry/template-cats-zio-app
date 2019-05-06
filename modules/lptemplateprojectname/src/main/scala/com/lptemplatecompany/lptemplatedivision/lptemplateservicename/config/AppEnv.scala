@@ -11,8 +11,8 @@ object appenv {
 
   object AppEnv {
     trait Service {
-      def config: UIO[Config]
-      def logger: UIO[Logger[UIO]]
+      def config: AIO[Config]
+      def logger: AIO[Logger[UIO]]
     }
   }
 
@@ -30,8 +30,8 @@ object appenv {
   def service(cfg: Config, log: Logger[UIO]): AppEnv.Service =
     new AppEnv.Service {
       override def config: UIO[Config] =
-        UIO(cfg)
+        UIO(cfg)  // UIO since cannot fail
       override def logger: UIO[Logger[UIO]] =
-        UIO(log)
+        UIO(log)  // UIO since cannot fail
     }
 }
