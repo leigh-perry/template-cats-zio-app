@@ -1,6 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
@@ -41,13 +41,12 @@ object AppMain
     } yield outcome
 
   private def runApp(log: Logger[UIO]): RAIO[Unit] =
-    Context.create
-      .use {
-        ctx =>
-          ctx.service.run
-      }.tapBoth(
-      e => log.error(s"Application failed: $e"),
-      _ => log.info("Application terminated with no error indication")
-    )
-
+    for {
+      ctx <- appenv.context
+      _ <- ctx.use(_.service.run)
+        .tapBoth(
+          e => log.error(s"Application failed: $e"),
+          _ => log.info("Application terminated with no error indication")
+        )
+    } yield ()
 }

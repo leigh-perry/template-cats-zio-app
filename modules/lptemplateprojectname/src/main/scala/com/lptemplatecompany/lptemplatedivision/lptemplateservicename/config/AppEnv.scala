@@ -2,7 +2,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.{UIO, ZIO}
+import scalaz.zio.{UIO, ZIO, ZManaged}
 
 object appenv {
   trait AppEnv {
@@ -13,6 +13,7 @@ object appenv {
     trait Service {
       def config: AIO[Config]
       def logger: AIO[Logger[UIO]]
+      def context: AIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]]
     }
   }
 
@@ -25,6 +26,9 @@ object appenv {
   def logger: RAIO[Logger[UIO]] =
     ZIO.accessM(_.appEnv.logger)
 
+  def context: RAIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]] =
+    ZIO.accessM(_.appEnv.context)
+
   ////
 
   def service(cfg: Config, log: Logger[UIO]): AppEnv.Service =
@@ -33,5 +37,7 @@ object appenv {
         UIO(cfg)  // UIO since cannot fail
       override def logger: UIO[Logger[UIO]] =
         UIO(log)  // UIO since cannot fail
+      override def context: AIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]] =
+        AIO(Context.create)
     }
 }
