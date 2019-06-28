@@ -1,6 +1,6 @@
 import Dependencies._
 import sbt.Keys._
-import sbt.{ Resolver, _}
+import sbt.{Resolver, _}
 
 object ProjectDefaults {
   private val scalacOptionsWarnings =
@@ -46,8 +46,8 @@ object ProjectDefaults {
 
   val settings =
     Seq(
-      scalaVersion := Dependencies.Version.scala,
-      
+      scalaVersion := "2.12.8",
+
       scalacOptions ++=
         Seq(
           "-deprecation",
@@ -58,7 +58,7 @@ object ProjectDefaults {
           "-feature", // Emit warning and location for usages of features that should be imported explicitly.
           "-target:jvm-1.8",
           "-language:_",
-          "-Ybackend-parallelism", java.lang.Runtime.getRuntime.availableProcessors.toString
+          "-Ybackend-parallelism", java.lang.Runtime.getRuntime.availableProcessors.toString,
         ) ++ scalacOptionsWarnings,
 
       fork in Test := true,
@@ -72,7 +72,11 @@ object ProjectDefaults {
           "-Xmx1G",
           "-XX:MaxMetaspaceSize=512M",
           "-XX:+HeapDumpOnOutOfMemoryError",
-          "-XX:HeapDumpPath=./heap-dump.hprof"
+          "-XX:HeapDumpPath=./heap-dump.hprof",
+          "-XX:-IgnoreUnrecognizedVMOptions",
+          "-XX:+UnlockExperimentalVMOptions",
+          "-XX:+EnableJVMCI",
+          "-XX:+UseJVMCICompiler",
         ),
 
       // Disable warnings in console
@@ -86,7 +90,8 @@ object ProjectDefaults {
       resolvers ++=
         Seq(
           //Resolver.mavenLocal,
-          Resolver.typesafeRepo("releases"),
+          Resolver.typesafeRepo("releases")/*,
+          Resolver.sonatypeRepo("public"), "Confluent Maven Repo" at "http://packages.confluent.io/maven/"*/
         ),
 
       //Stops the auto creation of java / scala-2.11 directories
@@ -107,6 +112,5 @@ object ProjectDefaults {
       addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.10" cross CrossVersion.binary),
       addCompilerPlugin("com.olegpy" %% "better-monadic-for" % "0.3.0")
     )
-
 
 }
