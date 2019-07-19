@@ -18,8 +18,13 @@ object Logger {
     Sync[G].delay(org.slf4j.LoggerFactory.getLogger(getClass))
       .map(slf4jImpl[F])
 
+  def console[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
+    Sync[G].delay(consoleImpl[F])
+
   def silent[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
     Sync[G].delay(silentImpl[F])
+
+  ////
 
   private def slf4jImpl[F[_] : Applicative](slf: org.slf4j.Logger): Logger[F] =
     new Logger[F] {
@@ -39,6 +44,21 @@ object Logger {
         Either.catchNonFatal(op)
           .pure[F]
           .map(_.fold(e => println(s"PANIC: $e\nAttempted message: $message"), identity))
+    }
+
+  private def consoleImpl[F[_] : Applicative]: Logger[F] =
+    new Logger[F] {
+      override def error(message: => String): F[Unit] =
+        println(message).pure
+
+      override def warn(message: => String): F[Unit] =
+        println(message).pure
+
+      override def info(message: => String): F[Unit] =
+        println(message).pure
+
+      override def debug(message: => String): F[Unit] =
+        println(message).pure
     }
 
   private def silentImpl[F[_] : Applicative]: Logger[F] =

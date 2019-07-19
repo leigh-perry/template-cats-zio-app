@@ -17,7 +17,16 @@ object AppMain
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
     resolvedProgram
-      .fold(_ => 1, _ => 0)
+      .fold(
+        e => {
+          println(s"Application failed: $e")
+          1
+        },
+        _ => {
+          println("Application terminated with no error indication")
+          0
+        }
+      )
 
   /**
     * To prevent repeated evaluation of environmental dependencies, pre-compute them and
@@ -44,9 +53,5 @@ object AppMain
     for {
       ctx <- appenv.context
       _ <- ctx.use(_.service.run)
-        .tapBoth(
-          e => log.error(s"Application failed: $e"),
-          _ => log.info("Application terminated with no error indication")
-        )
     } yield ()
 }
