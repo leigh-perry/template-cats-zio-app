@@ -19,13 +19,19 @@ object IOSyntaxTest
       v: String =>
         ((throw new RuntimeException(v)): Int).failWithMsg(s"message $v")
           .runSync(appenvTest.Test)
-          .shouldSatisfy {
-            case Left(List(AppError.ExceptionEncountered(s))) =>
-              s.contains("RuntimeException") &&
-                s.contains(s"message $v")
-            case _ =>
-              false
-          }
+          .shouldSatisfy(
+            // New zio returns the exception twice in a list
+            _.fold(
+              _.headOption.fold(false) {
+                case AppError.ExceptionEncountered(s) =>
+                  s.contains("RuntimeException") &&
+                    s.contains(s"message $v:")
+                case _ =>
+                  false
+              },
+              _ => false
+            )
+          )
     }
   }
 
@@ -34,7 +40,15 @@ object IOSyntaxTest
       v: String =>
         ((throw new RuntimeException(v)): Int).failWith(DirectoryDeleteFailed(v))
           .runSync(appenvTest.Test)
-          .shouldBe(List(DirectoryDeleteFailed(v)).asLeft)
+          .shouldSatisfy(
+            _.fold(
+              _.headOption.fold(false) {
+                case AppError.DirectoryDeleteFailed(_) => true
+                case _ => false
+              },
+              _ => false
+            )
+          )
     }
   }
 
@@ -46,4 +60,5 @@ object IOSyntaxTest
           .shouldBe(v.asRight)
     }
   }
+
 }
