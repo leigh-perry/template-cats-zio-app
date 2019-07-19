@@ -41,6 +41,7 @@ object IOSyntaxTest
         ((throw new RuntimeException(v)): Int).failWith(DirectoryDeleteFailed(v))
           .runSync(appenvTest.Test)
           .shouldSatisfy(
+            // New zio returns the exception twice in a list
             _.fold(
               _.headOption.fold(false) {
                 case AppError.DirectoryDeleteFailed(_) => true
