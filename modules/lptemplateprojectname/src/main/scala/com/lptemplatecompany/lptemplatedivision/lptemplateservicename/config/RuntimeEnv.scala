@@ -17,7 +17,7 @@ object RuntimeEnv {
   def live(service: AppEnv.Service): RuntimeEnv with Clock.Live =
     new RuntimeEnv
       with Clock.Live {
-      override val appEnv =
+      override val appEnv: AppEnv.Service =
         service
     }
   // with Console.Live

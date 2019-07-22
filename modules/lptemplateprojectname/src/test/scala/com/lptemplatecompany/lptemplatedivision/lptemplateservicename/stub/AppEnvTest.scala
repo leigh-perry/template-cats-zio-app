@@ -15,7 +15,7 @@ object appenvTest {
     extends AppEnv
       with AIOSyntax {
 
-    override val appEnv =
+    override val appEnv: AppEnv.Service =
       new AppEnv.Service {
         override def config: UIO[Config] =
           UIO(Config.defaults)

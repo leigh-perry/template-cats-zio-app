@@ -8,7 +8,7 @@ import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
 import minitest.SimpleTestSuite
 import minitest.laws.Checkers
 
-object IOSyntaxTest
+object AIOSyntaxTest
   extends SimpleTestSuite
     with AIOSyntax
     with Checkers

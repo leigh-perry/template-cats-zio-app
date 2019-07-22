@@ -69,7 +69,7 @@ trait ToIOSyntaxSafeOps {
 
 final class IOSyntaxSafeOpsTask[A](t: Task[A]) {
   def asAIO: AIO[A] =
-    t.mapError(AppError.exception(_))
+    t.mapError(AppError.exception)
 }
 
 trait ToIOSyntaxSafeOpsTask {
