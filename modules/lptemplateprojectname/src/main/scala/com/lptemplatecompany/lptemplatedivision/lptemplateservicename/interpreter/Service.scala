@@ -4,7 +4,7 @@ package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{RuntimeEnv, appenv}
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.duration.Duration
@@ -47,7 +47,7 @@ import java.util.UUID
 import cats.syntax.monadError._
 
 object FileSystem
-  extends IOSyntax {
+  extends AIOSyntax {
 
   def tempDirectoryScope(log: Logger[UIO]): ZManaged[RuntimeEnv, AppError, String] =
     Apps.managed(

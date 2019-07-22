@@ -3,7 +3,7 @@ package stub
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, Context, RuntimeEnv}
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.clock.Clock
 import scalaz.zio.interop.catz._
@@ -13,7 +13,7 @@ object appenvTest {
 
   trait Test
     extends AppEnv
-      with IOSyntax {
+      with AIOSyntax {
 
     override val appEnv =
       new AppEnv.Service {

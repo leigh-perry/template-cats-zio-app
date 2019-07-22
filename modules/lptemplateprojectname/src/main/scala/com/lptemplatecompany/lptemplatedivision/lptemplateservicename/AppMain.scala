@@ -2,7 +2,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Config, RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.interop.catz._
 import scalaz.zio.{App, Task, UIO, ZIO}
@@ -13,7 +13,7 @@ import scalaz.zio.{App, Task, UIO, ZIO}
   */
 object AppMain
   extends App
-    with IOSyntax {
+    with AIOSyntax {
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
     resolvedProgram

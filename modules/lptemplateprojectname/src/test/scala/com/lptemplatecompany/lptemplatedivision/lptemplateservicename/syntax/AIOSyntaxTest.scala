@@ -10,7 +10,7 @@ import minitest.laws.Checkers
 
 object IOSyntaxTest
   extends SimpleTestSuite
-    with IOSyntax
+    with AIOSyntax
     with Checkers
     with TestSupport {
 

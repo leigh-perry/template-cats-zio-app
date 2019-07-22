@@ -7,7 +7,7 @@ import cats.syntax.contravariantSemigroupal._
 import cats.syntax.either._
 import cats.syntax.functor._
 import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.IOSyntax
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import scalaz.zio.Task
 import scalaz.zio.interop.catz._
 
@@ -20,7 +20,7 @@ final case class Config(
 )
 
 object Config
-  extends IOSyntax {
+  extends AIOSyntax {
 
   implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, Config] =
     Configured[F, KafkaConfig].withSuffix("KAFKA")
