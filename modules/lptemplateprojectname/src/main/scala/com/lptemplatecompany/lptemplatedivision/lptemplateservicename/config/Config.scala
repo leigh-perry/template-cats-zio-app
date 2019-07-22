@@ -44,6 +44,7 @@ object Config
       kafka =
         KafkaConfig(
           bootstrapServers = KafkaBootstrapServers("localhost:9092"),
+          schemaRegistryUrl = KafkaSchemaRegistryUrl("http://localhost:8081"),
           List.empty,
           None,
         ),
@@ -53,6 +54,7 @@ object Config
 
 case class KafkaConfig(
   bootstrapServers: KafkaBootstrapServers,
+  schemaRegistryUrl: KafkaSchemaRegistryUrl,
   properties: List[PropertyValue],
   verbose: Option[Boolean]
 )
@@ -60,6 +62,7 @@ case class KafkaConfig(
 object KafkaConfig {
   implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, KafkaConfig] = (
     Configured[F, KafkaBootstrapServers].withSuffix("BOOTSTRAP_SERVERS"),
+    Configured[F, KafkaSchemaRegistryUrl].withSuffix("SCHEMA_REGISTRY_URL"),
     Configured[F, List[PropertyValue]].withSuffix("PROPERTY"),
     Configured[F, Option[Boolean]].withSuffix("VERBOSE"),
   ).mapN(KafkaConfig.apply)
@@ -69,6 +72,12 @@ final case class KafkaBootstrapServers(value: String) extends AnyVal
 object KafkaBootstrapServers {
   implicit def conversion: Conversion[KafkaBootstrapServers] =
     Conversion[String].map(KafkaBootstrapServers.apply)
+}
+
+final case class KafkaSchemaRegistryUrl(value: String) extends AnyVal
+object KafkaSchemaRegistryUrl {
+  implicit def conversion: Conversion[KafkaSchemaRegistryUrl] =
+    Conversion[String].map(KafkaSchemaRegistryUrl.apply)
 }
 
 case class PropertyValue(name: String, value: String)
