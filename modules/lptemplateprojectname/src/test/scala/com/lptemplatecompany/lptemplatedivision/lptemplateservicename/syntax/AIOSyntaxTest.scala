@@ -1,7 +1,7 @@
-package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
+package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
+package syntax
 
 import cats.syntax.either._
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError.DirectoryDeleteFailed
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.stub.appenvTest
 import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport

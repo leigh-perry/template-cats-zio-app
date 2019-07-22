@@ -1,6 +1,6 @@
-package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax
+package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
+package syntax
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.{AIO, AppError}
 import scalaz.zio.{Task, ZIO}
 
 object AIOSyntax {
