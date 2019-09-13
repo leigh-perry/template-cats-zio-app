@@ -39,7 +39,7 @@ object AppMain
       resolved <- program.provide(RuntimeEnv.live(appenv.service(cfg, log)))
     } yield resolved
 
-  private def program: RAIO[Unit] =
+  private def program: ZIO[RuntimeEnv, AppError, Unit] =
     for {
       cfg <- appenv.config
       log <- appenv.logger
@@ -49,7 +49,7 @@ object AppMain
       outcome <- runApp(log)
     } yield outcome
 
-  private def runApp(log: Logger[UIO]): RAIO[Unit] =
+  private def runApp(log: Logger[UIO]): ZIO[RuntimeEnv, AppError, Unit] =
     for {
       ctx <- appenv.context
       _ <- ctx.use(_.service.run)

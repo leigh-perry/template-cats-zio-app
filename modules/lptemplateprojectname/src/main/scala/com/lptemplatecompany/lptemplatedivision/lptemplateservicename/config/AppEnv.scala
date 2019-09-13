@@ -13,20 +13,20 @@ object appenv {
     trait Service {
       def config: AIO[Config]
       def logger: AIO[Logger[UIO]]
-      def context: AIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]]
+      def context: AIO[ZManaged[RuntimeEnv, AppError, Context[ZIO[RuntimeEnv, AppError, *]]]]
     }
   }
 
   ////
 
   // shortcuts
-  def config: RAIO[Config] =
+  def config: ZIO[RuntimeEnv, AppError, Config] =
     ZIO.accessM(_.appEnv.config)
 
-  def logger: RAIO[Logger[UIO]] =
+  def logger: ZIO[RuntimeEnv, AppError, Logger[UIO]] =
     ZIO.accessM(_.appEnv.logger)
 
-  def context: RAIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]] =
+  def context: ZIO[RuntimeEnv, AppError, ZManaged[RuntimeEnv, AppError, Context[ZIO[RuntimeEnv, AppError, *]]]] =
     ZIO.accessM(_.appEnv.context)
 
   ////
@@ -34,10 +34,10 @@ object appenv {
   def service(cfg: Config, log: Logger[UIO]): AppEnv.Service =
     new AppEnv.Service {
       override def config: UIO[Config] =
-        UIO(cfg)  // UIO since cannot fail
+        UIO(cfg) // UIO since cannot fail
       override def logger: UIO[Logger[UIO]] =
-        UIO(log)  // UIO since cannot fail
-      override def context: AIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]] =
+        UIO(log) // UIO since cannot fail
+      override def context: AIO[ZManaged[RuntimeEnv, AppError, Context[ZIO[RuntimeEnv, AppError, *]]]] =
         AIO(Context.create)
     }
 }

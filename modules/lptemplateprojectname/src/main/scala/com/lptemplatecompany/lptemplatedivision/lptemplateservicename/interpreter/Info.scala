@@ -6,9 +6,10 @@ import cats.instances.order._
 import cats.instances.string._
 import cats.syntax.applicative._
 import cats.syntax.traverse._
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
+import scalaz.zio.{IO, ZIO}
 import scalaz.zio.interop.catz._
 
 /**
@@ -16,23 +17,23 @@ import scalaz.zio.interop.catz._
   * application startup
   */
 class Info
-  extends InfoAlg[RAIO] {
+  extends InfoAlg[ZIO[RuntimeEnv, AppError, *]] {
 
   import scala.collection.JavaConverters._
 
-  override def systemProperties: RAIO[Map[String, String]] =
-    System.getProperties.asScala.toMap.pure[RAIO]
+  override def systemProperties: ZIO[RuntimeEnv, AppError, Map[String, String]] =
+    System.getProperties.asScala.toMap.pure[ZIO[RuntimeEnv, AppError, *]]
 
-  override def environmentVariables: RAIO[Map[String, String]] =
-    System.getenv.asScala.toMap.pure[RAIO]
+  override def environmentVariables: ZIO[RuntimeEnv, AppError, Map[String, String]] =
+    System.getenv.asScala.toMap.pure[ZIO[RuntimeEnv, AppError, *]]
 
-  override def logBanner: RAIO[Unit] =
+  override def logBanner: ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       r <- log.info(banner)
     } yield r
 
-  override def logMap(m: Map[String, String]): RAIO[Unit] =
+  override def logMap(m: Map[String, String]): ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       r <- m.toList
@@ -41,20 +42,20 @@ class Info
         .unit
     } yield r
 
-  override def logConfig: RAIO[Unit] =
+  override def logConfig: ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       cfg <- appenv.config
       r <- log.info(s"Configuration $cfg")
     } yield r
 
-  override def logSeparator: RAIO[Unit] =
+  override def logSeparator: ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       r <- log.info(separator)
     } yield r
 
-  override def logTitle(title: String): RAIO[Unit] =
+  override def logTitle(title: String): ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       r <- log.info(title)
@@ -83,6 +84,6 @@ class Info
 }
 
 object Info {
-  def of: RAIO[Info] =
-    RAIO(new Info)
+  def of: ZIO[RuntimeEnv, AppError, Info] =
+    IO.succeed(new Info)
 }

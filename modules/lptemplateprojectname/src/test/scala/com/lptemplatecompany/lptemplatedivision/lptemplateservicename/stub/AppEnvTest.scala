@@ -7,7 +7,7 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIO
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.clock.Clock
 import scalaz.zio.interop.catz._
-import scalaz.zio.{Task, UIO, ZManaged}
+import scalaz.zio.{Task, UIO, ZIO, ZManaged}
 
 object appenvTest {
 
@@ -22,7 +22,7 @@ object appenvTest {
         override def logger: AIO[Logger[UIO]] =
           Logger.slf4j[UIO, Task]
             .asAIO
-        override def context: UIO[ZManaged[RuntimeEnv, AppError, Context[RAIO]]] =
+        override def context: UIO[ZManaged[RuntimeEnv, AppError, Context[ZIO[RuntimeEnv, AppError, *]]]] =
           UIO(Context.create)
       }
   }

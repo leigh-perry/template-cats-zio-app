@@ -9,17 +9,17 @@ import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import scalaz.zio.duration.Duration
 import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed, UIO, ZManaged, clock}
+import scalaz.zio.{IO, Managed, UIO, ZIO, ZManaged, clock}
 
 /**
   * The real-infrastructure implementation for the top level service
   */
 class Service private(tempDir: String)
-  extends ServiceAlg[RAIO] {
+  extends ServiceAlg[ZIO[RuntimeEnv, AppError, *]] {
 
   import scala.concurrent.duration.DurationInt
 
-  override def run: RAIO[Unit] =
+  override def run: ZIO[RuntimeEnv, AppError, Unit] =
     for {
       log <- appenv.logger
       r <- log.info(s"Starting in $tempDir")
@@ -30,11 +30,11 @@ class Service private(tempDir: String)
 }
 
 object Service {
-  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[RAIO]] =
+  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[ZIO[RuntimeEnv, AppError, *]]] =
     for {
       log <- Managed.fromEffect(appenv.logger)
       tempDir <- FileSystem.tempDirectoryScope(log)
-      svc <- Managed.fromEffect(RAIO(new Service(tempDir): ServiceAlg[RAIO]))
+      svc <- Managed.fromEffect(ZIO.succeed(new Service(tempDir)))
     } yield svc
 }
 
@@ -61,22 +61,22 @@ object FileSystem
           log.info(s"Removed temp directory $dir")
     )
 
-  def tempFilename(extension: Option[String]): RAIO[String] =
+  def tempFilename(extension: Option[String]): ZIO[RuntimeEnv, AppError, String] =
     UUID.randomUUID.toString
       .failWithMsg("UUID.randomUUID failed")
       .map(name => extension.fold(name)(ext => s"$name.$ext"))
 
-  def baseTempDir: RAIO[String] =
+  def baseTempDir: ZIO[RuntimeEnv, AppError, String] =
     System.getProperty("java.io.tmpdir")
       .failWithMsg("Could not get tmpdir")
 
-  def deleteFileOrDirectory(filepath: String): RAIO[Unit] =
+  def deleteFileOrDirectory(filepath: String): ZIO[RuntimeEnv, AppError, Unit] =
     delete(new File(filepath))
       .failWithMsg(s"Could not delete $filepath")
       .ensure(AppError.DirectoryDeleteFailed(filepath))(identity)
       .unit
 
-  def createTempDir[A]: RAIO[String] =
+  def createTempDir[A]: ZIO[RuntimeEnv, AppError, String] =
     for {
       base <- baseTempDir
       parent <- IO.succeed(Path.of(base))
