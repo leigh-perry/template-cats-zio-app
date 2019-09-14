@@ -2,7 +2,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.{UIO, ZIO, ZManaged}
+import zio.{UIO, ZIO, ZManaged}
 
 object appenv {
   trait AppEnv {

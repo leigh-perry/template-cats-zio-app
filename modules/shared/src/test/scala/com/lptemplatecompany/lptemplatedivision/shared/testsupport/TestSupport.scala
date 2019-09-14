@@ -5,7 +5,7 @@ import cats.syntax.either._
 import cats.syntax.eq._
 import minitest.api.Asserts
 import org.scalacheck.Gen
-import scalaz.zio.{DefaultRuntime, ZIO}
+import zio.{DefaultRuntime, ZIO}
 
 import scala.language.implicitConversions
 

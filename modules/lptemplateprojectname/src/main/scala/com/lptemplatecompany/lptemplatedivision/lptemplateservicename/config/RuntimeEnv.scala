@@ -2,7 +2,7 @@ package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.appenv.AppEnv
-import scalaz.zio.clock.Clock
+import zio.clock.Clock
 
 /** Overall environment for ZIO application */
 trait RuntimeEnv

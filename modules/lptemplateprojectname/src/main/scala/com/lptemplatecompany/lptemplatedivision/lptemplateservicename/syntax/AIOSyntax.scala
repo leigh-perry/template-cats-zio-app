@@ -1,7 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package syntax
 
-import scalaz.zio.{Task, ZIO}
+import zio.{Task, ZIO}
 
 object AIOSyntax {
 

@@ -3,7 +3,7 @@ package shared
 
 import java.io.{PrintWriter, StringWriter}
 
-import scalaz.zio.{ZIO, ZManaged}
+import zio.{ZIO, ZManaged}
 
 object Apps
   extends GenIOSyntax {

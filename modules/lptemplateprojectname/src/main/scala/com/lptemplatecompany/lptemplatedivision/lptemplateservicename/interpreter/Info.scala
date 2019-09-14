@@ -9,8 +9,8 @@ import cats.syntax.traverse._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{RuntimeEnv, appenv}
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
-import scalaz.zio.{IO, ZIO}
-import scalaz.zio.interop.catz._
+import zio.{IO, ZIO}
+import zio.interop.catz._
 
 /**
   * The real-infrastructure implementation for logging of application information, typically at

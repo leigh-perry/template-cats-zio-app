@@ -7,9 +7,9 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Ru
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.duration.Duration
-import scalaz.zio.interop.catz._
-import scalaz.zio.{IO, Managed, UIO, ZIO, ZManaged, clock}
+import zio.duration.Duration
+import zio.interop.catz._
+import zio.{IO, Managed, UIO, ZIO, ZManaged, clock}
 
 /**
   * The real-infrastructure implementation for the top level service

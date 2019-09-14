@@ -3,7 +3,7 @@ package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
-import scalaz.zio.{ZIO, ZManaged}
+import zio.{ZIO, ZManaged}
 
 /**
   * Top level application resources held in a ZManaged[AppEnv, ...] so that proper cleanup happens

@@ -8,8 +8,8 @@ import cats.syntax.either._
 import cats.syntax.functor._
 import com.leighperry.conduction.config.{Configured, ConfiguredError, Conversion, Environment}
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
-import scalaz.zio.Task
-import scalaz.zio.interop.catz._
+import zio.Task
+import zio.interop.catz._
 
 
 /**

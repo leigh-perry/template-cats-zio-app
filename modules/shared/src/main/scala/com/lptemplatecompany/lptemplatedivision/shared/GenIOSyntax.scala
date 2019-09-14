@@ -1,11 +1,11 @@
 package com.lptemplatecompany.lptemplatedivision.shared
 
-import scalaz.zio.{IO, Task, ZIO}
+import zio.{IO, Task, ZIO}
 
 final class GenIOSyntaxSafeOps[R, E](op: => Unit) {
   def safely: ZIO[R, Nothing, Unit] =
     Task(op)
-      .catchAll[R, Nothing, Unit](e => ZIO.succeedLazy(println(s"PANIC: $e")))
+      .catchAll[R, Nothing, Unit](e => ZIO.effectTotal(println(s"PANIC: $e")))
 }
 
 trait ToGenIOSyntaxSafeOps {
@@ -17,7 +17,7 @@ trait ToGenIOSyntaxSafeOps {
 
 final class GenIOSyntaxSafeOpsIO[R, E](io: ZIO[R, E, Unit]) {
   def safely: ZIO[R, Nothing, Unit] =
-    io.catchAll(e => IO.succeedLazy(println(s"PANIC: $e")))
+    io.catchAll(e => IO.effectTotal(println(s"PANIC: $e")))
 }
 
 trait ToGenIOSyntaxSafeOpsIO {

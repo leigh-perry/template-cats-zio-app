@@ -4,8 +4,8 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{Co
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import scalaz.zio.interop.catz._
-import scalaz.zio.{App, Task, UIO, ZIO}
+import zio.interop.catz._
+import zio.{App, Task, UIO, ZIO}
 
 /**
   * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
