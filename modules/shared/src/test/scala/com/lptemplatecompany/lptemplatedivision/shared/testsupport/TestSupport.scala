@@ -5,7 +5,7 @@ import cats.syntax.either._
 import cats.syntax.eq._
 import minitest.api.Asserts
 import org.scalacheck.Gen
-import zio.{DefaultRuntime, ZIO}
+import zio.{DefaultRuntime, IO}
 
 import scala.language.implicitConversions
 
@@ -75,23 +75,23 @@ trait TestSupportGens {
   def genNonEmptyString(n: Int): Gen[String] =
     for {
       count <- Gen.choose(1, n)
-      chars <- Gen.listOfN(count, Gen.alphaChar)
+        chars <- Gen.listOfN(count, Gen.alphaChar)
     } yield chars.mkString
 
   def multilineGen(genTestString: Gen[String]): Gen[(List[String], String)] =
     for {
       scount <- Gen.chooseNum[Int](0, 20)
-      strings <- Gen.listOfN(scount, genTestString)
+        strings <- Gen.listOfN(scount, genTestString)
     } yield strings -> strings.flatMap(s => List("\n", s, "\n")).mkString("\n")
 }
 
 ////
 
-final class IOSyntaxSafeOpsTaskTesting[R, E, A](t: ZIO[R, E, A])
+final class IOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A])
   extends DefaultRuntime {
 
-  def runSync(r: R): Either[List[E], A] =
-    unsafeRunSync(t.provide(r))
+  def runSync(): Either[List[E], A] =
+    unsafeRunSync(t)
       .fold(
         _.fold(List[E]()) {
           case (errors, cause) => errors ++ cause.failures
@@ -102,8 +102,8 @@ final class IOSyntaxSafeOpsTaskTesting[R, E, A](t: ZIO[R, E, A])
 }
 
 trait ToIOSyntaxSafeOpsTaskTesting {
-  implicit def implToIOSyntaxSafeOpsTaskTesting[R, E, A](t: ZIO[R, E, A]): IOSyntaxSafeOpsTaskTesting[R, E, A] =
-    new IOSyntaxSafeOpsTaskTesting[R, E, A](t)
+  implicit def implToIOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A]): IOSyntaxSafeOpsTaskTesting[E, A] =
+    new IOSyntaxSafeOpsTaskTesting[E, A](t)
 }
 
 ////

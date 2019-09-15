@@ -3,7 +3,8 @@ package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
-import zio.{ZIO, ZManaged}
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import zio.Managed
 
 /**
   * Top level application resources held in a ZManaged[AppEnv, ...] so that proper cleanup happens
@@ -14,8 +15,8 @@ final case class Context[F[_]] private(
 )
 
 object Context {
-  def create: ZManaged[RuntimeEnv, AppError, Context[ZIO[RuntimeEnv, AppError, *]]] =
+  def create(cfg: Config, log: Logger[AIO]): Managed[AppError, Context[AIO]] =
     for {
-      service <- Service.managed
-    } yield new Context[ZIO[RuntimeEnv, AppError, *]](service)
+      service <- Service.managed(cfg, log)
+    } yield new Context[AIO](service)
 }

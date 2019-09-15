@@ -3,38 +3,37 @@ package lptemplateservicename
 package interpreter
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{RuntimeEnv, appenv}
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import zio.duration.Duration
 import zio.interop.catz._
-import zio.{IO, Managed, UIO, ZIO, ZManaged, clock}
+import zio.{IO, Managed, ZIO, clock}
 
 /**
   * The real-infrastructure implementation for the top level service
   */
-class Service private(tempDir: String)
-  extends ServiceAlg[ZIO[RuntimeEnv, AppError, *]] {
+class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
+  extends ServiceAlg[AIO]
+    with AIOSyntax {
 
   import scala.concurrent.duration.DurationInt
 
-  override def run: ZIO[RuntimeEnv, AppError, Unit] =
+  override def run: IO[AppError, Unit] =
     for {
-      log <- appenv.logger
       r <- log.info(s"Starting in $tempDir")
-      _ <- clock.sleep(Duration.fromScala(2.seconds))
-      _ <- log.info(s"Finishing in $tempDir")
+        _ <- clock.sleep(Duration.fromScala(2.seconds)).asAIO
+        _ <- log.info(s"Finishing in $tempDir")
     } yield r
 
 }
 
 object Service {
-  def managed: ZManaged[RuntimeEnv, AppError, ServiceAlg[ZIO[RuntimeEnv, AppError, *]]] =
+  def managed(cfg: Config, log: Logger[AIO]): Managed[AppError, ServiceAlg[AIO]] =
     for {
-      log <- Managed.fromEffect(appenv.logger)
       tempDir <- FileSystem.tempDirectoryScope(log)
-      svc <- Managed.fromEffect(ZIO.succeed(new Service(tempDir)))
+        svc <- Managed.fromEffect(ZIO.succeed(new Service(cfg, log, tempDir)))
     } yield svc
 }
 
@@ -49,11 +48,11 @@ import cats.syntax.monadError._
 object FileSystem
   extends AIOSyntax {
 
-  def tempDirectoryScope(log: Logger[UIO]): ZManaged[RuntimeEnv, AppError, String] =
+  def tempDirectoryScope(log: Logger[AIO]): Managed[AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir
-        _ <- log.info(s"Created temp directory $file")
+          _ <- log.info(s"Created temp directory $file")
       } yield file
     )(
       dir =>
@@ -61,27 +60,27 @@ object FileSystem
           log.info(s"Removed temp directory $dir")
     )
 
-  def tempFilename(extension: Option[String]): ZIO[RuntimeEnv, AppError, String] =
+  def tempFilename(extension: Option[String]): IO[AppError, String] =
     UUID.randomUUID.toString
       .failWithMsg("UUID.randomUUID failed")
       .map(name => extension.fold(name)(ext => s"$name.$ext"))
 
-  def baseTempDir: ZIO[RuntimeEnv, AppError, String] =
+  def baseTempDir: IO[AppError, String] =
     System.getProperty("java.io.tmpdir")
       .failWithMsg("Could not get tmpdir")
 
-  def deleteFileOrDirectory(filepath: String): ZIO[RuntimeEnv, AppError, Unit] =
+  def deleteFileOrDirectory(filepath: String): IO[AppError, Unit] =
     delete(new File(filepath))
       .failWithMsg(s"Could not delete $filepath")
       .ensure(AppError.DirectoryDeleteFailed(filepath))(identity)
       .unit
 
-  def createTempDir[A]: ZIO[RuntimeEnv, AppError, String] =
+  def createTempDir[A]: IO[AppError, String] =
     for {
       base <- baseTempDir
-      parent <- IO.succeed(Path.of(base))
-      tempPath <- Files.createTempDirectory(parent, "workspace").failWithMsg("Could not create temp dir")
-      tempDir <- tempPath.toFile.getAbsolutePath.failWithMsg(s"Could not resolve $tempPath")
+        parent <- IO.succeed(Path.of(base))
+        tempPath <- Files.createTempDirectory(parent, "workspace").failWithMsg("Could not create temp dir")
+        tempDir <- tempPath.toFile.getAbsolutePath.failWithMsg(s"Could not resolve $tempPath")
     } yield tempDir
 
   //// internal impure code

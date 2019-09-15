@@ -3,7 +3,6 @@ package syntax
 
 import cats.syntax.either._
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppError.DirectoryDeleteFailed
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.stub.appenvTest
 import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
 import minitest.SimpleTestSuite
 import minitest.laws.Checkers
@@ -18,7 +17,7 @@ object AIOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWithMsg(s"message $v")
-          .runSync(appenvTest.Test)
+          .runSync()
           .shouldSatisfy(
             // New zio returns the exception twice in a list
             _.fold(
@@ -39,7 +38,7 @@ object AIOSyntaxTest
     check1 {
       v: String =>
         ((throw new RuntimeException(v)): Int).failWith(DirectoryDeleteFailed(v))
-          .runSync(appenvTest.Test)
+          .runSync()
           .shouldSatisfy(
             // New zio returns the exception twice in a list
             _.fold(
@@ -57,7 +56,7 @@ object AIOSyntaxTest
     check1 {
       v: Int =>
         v.failWithMsg(s"message $v")
-          .runSync(appenvTest.Test)
+          .runSync()
           .shouldBe(v.asRight)
     }
   }
