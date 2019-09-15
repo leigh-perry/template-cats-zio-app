@@ -7,9 +7,8 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Con
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import zio.duration.Duration
 import zio.interop.catz._
-import zio.{IO, Managed, ZIO, clock}
+import zio.{IO, Managed, ZIO}
 
 /**
   * The real-infrastructure implementation for the top level service
@@ -17,8 +16,6 @@ import zio.{IO, Managed, ZIO, clock}
 class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
   extends ServiceAlg[AIO]
     with AIOSyntax {
-
-  import scala.concurrent.duration.DurationInt
 
   override def run: IO[AppError, Unit] =
     for {
