@@ -18,14 +18,8 @@ object AppMain
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
     program
       .fold(
-        e => {
-          println(s"Application failed: $e")
-          1
-        },
-        _ => {
-          println("Application terminated with no error indication")
-          0
-        }
+        e => exitWith(1, s"Application failed: $e"),
+        _ => exitWith(0, "Application terminated with no error indication")
       )
 
   /**
@@ -47,4 +41,9 @@ object AppMain
       ctx <- AIO(Context.create(cfg, log))
         _ <- ctx.use(_.service.run)
     } yield ()
+
+  private def exitWith(code: Int, message: String) = {
+    println(message)
+    code
+  }
 }

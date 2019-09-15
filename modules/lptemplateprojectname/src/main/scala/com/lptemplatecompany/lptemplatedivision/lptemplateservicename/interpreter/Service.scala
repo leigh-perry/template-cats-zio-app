@@ -23,7 +23,7 @@ class Service private(cfg: Config, log: Logger[AIO], tempDir: String)
   override def run: IO[AppError, Unit] =
     for {
       r <- log.info(s"Starting in $tempDir")
-        _ <- clock.sleep(Duration.fromScala(2.seconds)).asAIO
+        _ <- Thread.sleep(2000).asAIO
         _ <- log.info(s"Finishing in $tempDir")
     } yield r
 
