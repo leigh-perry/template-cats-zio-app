@@ -15,7 +15,7 @@ object Dependencies {
     val conduction = "0.3.6"
 
     val minitest = "2.7.0"
-    val scalacheck = "1.14.1"
+    val scalacheck = "1.14.2"
   }
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
