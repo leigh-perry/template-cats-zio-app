@@ -26,8 +26,6 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % Version.logback
   val conduction = "com.github.leigh-perry" %% "conduction-core" % Version.conduction
 
-  val minitest = "io.monix" %% "minitest" % Version.minitest
-  val minitestLaws = "io.monix" %% "minitest-laws" % Version.minitest
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
   val catsLaws = "org.typelevel" %% "cats-laws" % Version.cats
 }
