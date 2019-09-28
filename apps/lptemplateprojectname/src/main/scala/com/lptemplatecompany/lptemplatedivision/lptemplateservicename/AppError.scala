@@ -26,14 +26,15 @@ object AppError {
 
   implicit val showAppError: Show[AppError] =
     Show.show {
-      t: AppError => {
-        val extra: String =
-          t match {
-            case InvalidConfiguration(errors) => errors.show
-            case ExceptionEncountered(message) => message.show
-            case DirectoryDeleteFailed(dir) => dir.show
-          }
-        s"${Apps.className(t)}: $extra"
-      }
+      t: AppError =>
+        {
+          val extra: String =
+            t match {
+              case InvalidConfiguration(errors) => errors.show
+              case ExceptionEncountered(message) => message.show
+              case DirectoryDeleteFailed(dir) => dir.show
+            }
+          s"${Apps.className(t)}: $extra"
+        }
     }
 }

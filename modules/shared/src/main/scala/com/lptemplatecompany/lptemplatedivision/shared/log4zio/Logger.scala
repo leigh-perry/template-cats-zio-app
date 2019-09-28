@@ -14,19 +14,20 @@ trait Logger[+F[_]] {
 }
 
 object Logger {
-  def slf4j[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
-    Sync[G].delay(org.slf4j.LoggerFactory.getLogger(getClass))
+  def slf4j[F[_]: Applicative, G[_]: Sync]: G[Logger[F]] =
+    Sync[G]
+      .delay(org.slf4j.LoggerFactory.getLogger(getClass))
       .map(slf4jImpl[F])
 
-  def console[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
+  def console[F[_]: Applicative, G[_]: Sync]: G[Logger[F]] =
     Sync[G].delay(consoleImpl[F])
 
-  def silent[F[_] : Applicative, G[_] : Sync]: G[Logger[F]] =
+  def silent[F[_]: Applicative, G[_]: Sync]: G[Logger[F]] =
     Sync[G].delay(silentImpl[F])
 
   ////
 
-  private def slf4jImpl[F[_] : Applicative](slf: org.slf4j.Logger): Logger[F] =
+  private def slf4jImpl[F[_]: Applicative](slf: org.slf4j.Logger): Logger[F] =
     new Logger[F] {
       override def error(message: => String): F[Unit] =
         safely(slf.error(message), message)
@@ -41,12 +42,13 @@ object Logger {
         safely(slf.debug(message), message)
 
       def safely(op: => Unit, message: String): F[Unit] =
-        Either.catchNonFatal(op)
+        Either
+          .catchNonFatal(op)
           .pure[F]
           .map(_.fold(e => println(s"PANIC: $e\nAttempted message: $message"), identity))
     }
 
-  private def consoleImpl[F[_] : Applicative]: Logger[F] =
+  private def consoleImpl[F[_]: Applicative]: Logger[F] =
     new Logger[F] {
       override def error(message: => String): F[Unit] =
         println(message).pure
@@ -61,7 +63,7 @@ object Logger {
         println(message).pure
     }
 
-  private def silentImpl[F[_] : Applicative]: Logger[F] =
+  private def silentImpl[F[_]: Applicative]: Logger[F] =
     new Logger[F] {
       override def error(message: => String): F[Unit] =
         ().pure

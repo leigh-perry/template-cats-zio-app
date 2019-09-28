@@ -51,18 +51,18 @@ lazy val commonSettings =
     scalaVersion := Scala_213,
     scalacOptions ++= commonScalacOptions(scalaVersion.value),
     fork in Test := true,
-    testFrameworks += new TestFramework("minitest.runner.Framework"),
+    testFrameworks += new TestFramework("org.scalacheck.ScalaCheckFramework"),
     name := projectName,
     updateOptions := updateOptions.value.withGigahorse(false),
     libraryDependencies ++=
       Seq(
-        minitest % "test",
-        minitestLaws % "test",
         scalacheck % "test"
       ) ++ compilerPlugins
   )
 
-lazy val crossBuiltCommonSettings = commonSettings ++ Seq(crossScalaVersions := Seq(Scala_212, Scala_213))
+lazy val crossBuiltCommonSettings = commonSettings ++ Seq(
+  crossScalaVersions := Seq(Scala_212, Scala_213)
+)
 
 lazy val shared =
   module("shared")
@@ -76,7 +76,8 @@ lazy val shared =
           logback,
           conduction
         )
-    ).enablePlugins(BuildInfoPlugin)
+    )
+    .enablePlugins(BuildInfoPlugin)
     .settings(
       buildInfoKeys :=
         Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion) ++
@@ -89,7 +90,7 @@ lazy val shared =
             BuildInfoKey.action("gitCommitAuthor")(gitCommitAuthor),
             BuildInfoKey.action("gitCommitDate")(git.gitHeadCommitDate.value.get),
             BuildInfoKey.action("gitMessage")(git.gitHeadMessage.value.get),
-            BuildInfoKey.action("gitUncommittedChanges")(git.gitUncommittedChanges.value),
+            BuildInfoKey.action("gitUncommittedChanges")(git.gitUncommittedChanges.value)
           ),
       buildInfoPackage := "com.lptemplatecompany.lptemplatedivision.lptemplateservicename"
     )
@@ -100,8 +101,9 @@ lazy val lptemplateprojectname =
     .settings(
       libraryDependencies ++=
         Seq(
-        )
-    ).enablePlugins(BuildInfoPlugin)
+          )
+    )
+    .enablePlugins(BuildInfoPlugin)
 
 lazy val allModules = List(shared, lptemplateprojectname)
 
@@ -111,6 +113,9 @@ lazy val root =
     .settings(commonSettings)
     .settings(skip in publish := true, crossScalaVersions := List())
     .aggregate((allModules).map(x => x: ProjectReference): _*)
+
+addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
+addCommandAlias("fmtcheck", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
 
 ////
 
@@ -126,7 +131,8 @@ def app(appName: String): Project =
 
 def versionDependentExtraScalacOptions(scalaVersion: String) =
   CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, minor)) if minor < 13 => Seq("-Yno-adapted-args", "-Xfuture", "-Ypartial-unification")
+    case Some((2, minor)) if minor < 13 =>
+      Seq("-Yno-adapted-args", "-Xfuture", "-Ypartial-unification")
     case _ => Nil
   }
 

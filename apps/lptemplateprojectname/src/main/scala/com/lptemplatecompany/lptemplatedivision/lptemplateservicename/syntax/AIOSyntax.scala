@@ -1,7 +1,7 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 package syntax
 
-import zio.{Task, ZIO}
+import zio.{ Task, ZIO }
 
 object AIOSyntax {
 
@@ -81,10 +81,9 @@ trait ToIOSyntaxSafeOpsTask {
 
 trait AIOSyntax
   extends ToAIOSyntaxEitherOps
-    with ToAIOSyntaxAppErrorOps
-    with ToAIOSyntaxAOps
-    with ToIOSyntaxSafeOps
-    with ToIOSyntaxSafeOpsTask
+  with ToAIOSyntaxAppErrorOps
+  with ToAIOSyntaxAOps
+  with ToIOSyntaxSafeOps
+  with ToIOSyntaxSafeOpsTask
 
-object aiosyntaxinstances
-  extends AIOSyntax
+object aiosyntaxinstances extends AIOSyntax

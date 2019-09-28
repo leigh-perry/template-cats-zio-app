@@ -27,9 +27,6 @@ trait ToGenIOSyntaxSafeOpsIO {
 
 ////
 
-trait GenIOSyntax
-  extends ToGenIOSyntaxSafeOps
-    with ToGenIOSyntaxSafeOpsIO
+trait GenIOSyntax extends ToGenIOSyntaxSafeOps with ToGenIOSyntaxSafeOpsIO
 
-object geniosyntaxinstances
-  extends GenIOSyntax
+object geniosyntaxinstances extends GenIOSyntax

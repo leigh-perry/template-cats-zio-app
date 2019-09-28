@@ -1,11 +1,11 @@
 package com.lptemplatecompany.lptemplatedivision.shared
 
-import minitest.SimpleTestSuite
-import minitest.laws.Checkers
+import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
+import org.scalacheck.Properties
 
-object AppsTest extends SimpleTestSuite with Checkers {
-  test("class name deduction") {
-    assertEquals(Apps.className(Apps), "Apps")
-    assertEquals(Apps.className(AppsTest), "AppsTest")
+object AppsTest extends Properties("AppsTest") with TestSupport {
+  property("Missing Configured[IO, List[Endpoint]]") = simpleTest {
+    Apps.className(Apps).shouldBe("Apps") && Apps.className(AppsTest).shouldBe("AppsTest")
   }
+
 }

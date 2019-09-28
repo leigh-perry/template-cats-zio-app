@@ -4,13 +4,12 @@ import cats.Monad
 import cats.syntax.flatMap._
 import cats.syntax.functor._
 
-
 /**
-  * Tagless final abstraction for logging of application information, typically at
-  * application startup
-  *
-  * @tparam F the target effect
-  */
+ * Tagless final abstraction for logging of application information, typically at
+ * application startup
+ *
+ * @tparam F the target effect
+ */
 trait InfoAlg[F[_]] {
   def systemProperties: F[Map[String, String]]
   def environmentVariables: F[Map[String, String]]

@@ -13,13 +13,12 @@ import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 
 /**
-  * The real-infrastructure implementation for logging of application information, typically at
-  * application startup
-  *
-  * C = config class
-  */
-class Info[F[_] : Monad, C](cfg: C, log: Logger[F])
-  extends InfoAlg[F] {
+ * The real-infrastructure implementation for logging of application information, typically at
+ * application startup
+ *
+ * C = config class
+ */
+class Info[F[_]: Monad, C](cfg: C, log: Logger[F]) extends InfoAlg[F] {
 
   import scala.collection.JavaConverters._
 
@@ -60,17 +59,17 @@ class Info[F[_] : Monad, C](cfg: C, log: Logger[F])
        |  gitCommitDate         : ${BuildInfo.gitCommitDate}
        |  gitMessage            : ${Apps.loggable(BuildInfo.gitMessage.trim)}
        |  gitUncommittedChanges : ${BuildInfo.gitUncommittedChanges}
-       |  library-dependencies  : ${BuildInfo.libraryDependencies}"""
-      .stripMargin
+       |  library-dependencies  : ${BuildInfo.libraryDependencies}""".stripMargin
 
-  private val separator = "================================================================================"
+  private val separator =
+    "================================================================================"
 
   private def formatMapEntry(e: (String, String)): String =
     s"${e._1}=${Apps.loggable(e._2)}"
 }
 
 object Info {
-  def of[F[_] : Monad, C](cfg: C, log: Logger[F]): F[Info[F, C]] =
+  def of[F[_]: Monad, C](cfg: C, log: Logger[F]): F[Info[F, C]] =
     new Info(cfg, log)
       .pure[F]
 }

@@ -1,5 +1,3 @@
 package com.lptemplatecompany
 
-package object lptemplatedivision  {
-
-}
+package object lptemplatedivision {}

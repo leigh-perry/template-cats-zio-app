@@ -7,10 +7,10 @@ import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
 import zio.Managed
 
 /**
-  * Top level application resources held in a ZManaged[AppEnv, ...] so that proper cleanup happens
-  * on program termination, whether clean or failure.
-  */
-final case class Context[F[_]] private(
+ * Top level application resources held in a ZManaged[AppEnv, ...] so that proper cleanup happens
+ * on program termination, whether clean or failure.
+ */
+final case class Context[F[_]] private (
   service: ServiceAlg[F]
 )
 
