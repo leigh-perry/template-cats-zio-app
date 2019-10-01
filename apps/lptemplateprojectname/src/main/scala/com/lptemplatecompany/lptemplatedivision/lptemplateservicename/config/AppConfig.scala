@@ -7,30 +7,29 @@ import cats.syntax.contravariantSemigroupal._
 import cats.syntax.either._
 import cats.syntax.functor._
 import com.leighperry.conduction.config.{ Configured, ConfiguredError, Conversion, Environment }
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
-import zio.Task
 import zio.interop.catz._
+import zio.{ Task, ZIO }
 
 /**
  * Overall application configuration
  */
-final case class Config(
+final case class AppConfig(
   kafka: KafkaConfig
 )
 
-object Config extends AIOSyntax {
+object AppConfig {
 
-  implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, Config] =
+  implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, AppConfig] =
     Configured[F, KafkaConfig]
       .withSuffix("KAFKA")
-      .map(Config.apply)
+      .map(AppConfig.apply)
 
-  def load: AIO[Config] = {
-    val task: Task[Either[NonEmptyChain[ConfiguredError], Config]] =
+  def load: ZIO[Any, AppError, AppConfig] = {
+    val task: Task[Either[NonEmptyChain[ConfiguredError], AppConfig]] =
       for {
         env <- Environment.fromEnvVars[Task]
         logenv <- Environment.logging[Task](env, Environment.printer)
-        cio <- Configured[Task, Config]("LPTEMPLATESERVICENAME").run(logenv)
+        cio <- Configured[Task, AppConfig]("LPTEMPLATESERVICENAME").run(logenv)
       } yield cio.toEither
 
     task
@@ -39,8 +38,8 @@ object Config extends AIOSyntax {
       .absolve
   }
 
-  val defaults: Config =
-    Config(
+  val defaults: AppConfig =
+    AppConfig(
       kafka = KafkaConfig(
         bootstrapServers = KafkaBootstrapServers("localhost:9092"),
         schemaRegistryUrl = KafkaSchemaRegistryUrl("http://localhost:8081"),

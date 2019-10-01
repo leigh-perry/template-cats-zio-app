@@ -1,5 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.AppConfig
 import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
 import zio.blocking.Blocking
 import zio.{ App, ZIO }
@@ -10,34 +11,26 @@ trait SparkSession {
   def sql(value: "select * from SOMETHING"): DataFrame =
     new DataFrame {}
 
-  def version: String = "dummy"
+  def version: String = 
+    "dummy"
 
 }
 trait DataFrame
 
 ////
 
-final case class AppConfig(kafkaBrokers: String, schemaRegistryAddr: String)
-
-trait AppConfigError
-
 /**
  * Support for loading stuff the app needs in order to get started
  */
 object Bootstrap {
   trait ConfigSupport {
-    def load: ZIO[Any, AppConfigError, AppConfig]
+    def load: ZIO[Any, AppError, AppConfig]
   }
 
   object ConfigSupport {
     trait Live extends ConfigSupport {
-      override def load: ZIO[Any, AppConfigError, AppConfig] =
-        ZIO.succeed(
-          AppConfig(
-            kafkaBrokers = "localhost:9092",
-            schemaRegistryAddr = "http://localhost:8081"
-          )
-        )
+      override def load: ZIO[Any, AppError, AppConfig] =
+        AppConfig.load
     }
 
     object Live extends Live
@@ -45,12 +38,9 @@ object Bootstrap {
 
   object TestConfiguration {
     trait Test extends ConfigSupport {
-      override def load: ZIO[Any, AppConfigError, AppConfig] =
+      override def load: ZIO[Any, AppError, AppConfig] =
         ZIO.succeed(
-          AppConfig(
-            kafkaBrokers = "localhost:9092",
-            schemaRegistryAddr = "http://localhost:8081"
-          )
+          AppConfig.defaults
         )
     }
 
@@ -152,7 +142,7 @@ object AppRuntime {
 object Main extends App {
 
   sealed trait MainAppError
-  final case class ConfigLoadError(message: AppConfigError) extends MainAppError
+  final case class ConfigLoadError(message: AppError) extends MainAppError
   final case class ExceptionEncountered(exception: Throwable) extends MainAppError
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =

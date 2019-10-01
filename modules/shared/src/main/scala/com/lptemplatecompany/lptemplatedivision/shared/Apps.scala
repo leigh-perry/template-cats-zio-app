@@ -3,8 +3,6 @@ package shared
 
 import java.io.{ PrintWriter, StringWriter }
 
-import zio.{ ZIO, ZManaged }
-
 object Apps extends GenIOSyntax {
 
   def className(o: AnyRef): String =
@@ -24,9 +22,5 @@ object Apps extends GenIOSyntax {
       .replaceAll("\n", """\\n""")
       .replaceAll("\r", """\\r""")
       .replaceAll("\t", """\\t""")
-
-  /** Handle the need for `release` action to be error-free (UIO) */
-  def managed[R, E, A](acquire: ZIO[R, E, A])(release: A => ZIO[R, E, Unit]): ZManaged[R, E, A] =
-    ZManaged.make(acquire)(release(_).safely)
 
 }

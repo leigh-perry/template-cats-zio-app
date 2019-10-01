@@ -6,7 +6,6 @@ import cats.instances.list._
 import cats.instances.order._
 import cats.instances.string._
 import cats.syntax.applicative._
-import cats.syntax.functor._
 import cats.syntax.traverse._
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
@@ -22,7 +21,7 @@ import zio.interop.catz._
  */
 class Info[C](cfg: C, log: Log) extends InfoAlg[UIO] {
 
-  import scala.collection.JavaConverters._
+  import scala.jdk.CollectionConverters._
 
   override def systemProperties: UIO[Map[String, String]] =
     System.getProperties.asScala.toMap.pure[UIO]
