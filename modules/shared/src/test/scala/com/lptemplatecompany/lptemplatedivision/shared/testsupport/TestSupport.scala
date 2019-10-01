@@ -1,11 +1,10 @@
 package com.lptemplatecompany.lptemplatedivision.shared.testsupport
 
-import cats.Eq
-import cats.syntax.either._
-import cats.syntax.eq._
 import org.scalacheck.Prop.forAll
-import org.scalacheck.{ Arbitrary, Gen, Prop }
-import zio.{ DefaultRuntime, IO }
+import org.scalacheck.util.Pretty
+import org.scalacheck.{ Arbitrary, Gen, Prop, Shrink }
+import zio.console.Console
+import zio.{ DefaultRuntime, ZIO }
 
 final class TestSupportOps[A](val actual: A) {
   def shouldBe(expected: A): Boolean = {
@@ -34,60 +33,47 @@ trait ToTestSupportOps {
 
 ////
 
-final class TestSupportEqOps[A: Eq](val actual: A) {
-  def shouldBeEq(expected: A): Boolean = {
-    val result = expected === actual
-    if (!result) {
-      println(s"       => FAIL: expected[$expected]")
-      println(s"                  actual[$actual]")
+final class TestSupportZIOOps[E, A](val io: ZIO[Any, E, A]) {
+  def shouldBeIO(expected: A): ZIO[Console, E, Boolean] =
+    ZIO.accessM {
+      env =>
+        io.flatMap {
+          actual =>
+            val result = expected == actual
+            if (!result) {
+              env
+                .console
+                .putStrLn(
+                  s"""       => FAIL: expected[$expected]
+                     |                  actual[$actual]""".stripMargin
+                )
+                .map(_ => result)
+            } else {
+              ZIO.succeed(result)
+            }
+        }
     }
-    result
-  }
 
-  def assertIsEq(expected: A): Unit = {
-    shouldBeEq(expected)
-    assert(actual === expected)
-  }
+  def shouldSatisfyIO(f: A => Boolean): ZIO[Console, E, Boolean] =
+    ZIO.accessM {
+      env =>
+        io.flatMap {
+          actual =>
+            val result = f(actual)
+            if (!result) {
+              env
+                .console
+                .putStrLn(s"       => FAIL:   doesn't satisfy, actual: [$actual]")
+                .map(_ => result)
+            } else ZIO.succeed(result)
+        }
+    }
 }
 
-trait ToTestSupportEqOps {
-  implicit def `Ops for TestSupport Eq`[A: Eq](actual: A): TestSupportEqOps[A] =
-    new TestSupportEqOps[A](actual)
+trait ToTestSupportZIOOps {
+  implicit def `instanceTestSupportZIO`[E, A](io: ZIO[Any, E, A]): TestSupportZIOOps[E, A] =
+    new TestSupportZIOOps[E, A](io)
 }
-
-////
-
-//final class TestSupportIOOps[E, A](val io: IO[A]) {
-//  def shouldBeIO(expected: A): IO[Boolean] =
-//    io.flatMap {
-//      actual =>
-//        val result = expected == actual
-//        if (!result) {
-//          IO.delay(
-//              println(
-//                s"""       => FAIL: expected[$expected]
-//                   |                  actual[$actual]""".stripMargin
-//              )
-//            )
-//            .map(_ => result)
-//        } else IO(result)
-//    }
-//
-//  def shouldSatisfyIO(f: A => Boolean): IO[Boolean] =
-//    io.flatMap {
-//      actual =>
-//        val result = f(actual)
-//        if (!result) {
-//          IO.delay(println(s"       => FAIL:   doesn't satisfy, actual: [$actual]"))
-//            .map(_ => result)
-//        } else IO(result)
-//    }
-//}
-
-//trait ToTestSupportIOOps {
-//  implicit def `instanceTestSupportIO`[E, A](io: IO[A]): TestSupportIOOps[E, A] =
-//    new TestSupportIOOps[E, A](io)
-//}
 
 ////
 
@@ -104,36 +90,34 @@ trait TestSupportGens {
   def genSymbol(minLength: Int, maxLength: Int): Gen[String] =
     for {
       n <- Gen.chooseNum(minLength, maxLength)
-      chars <- Gen.listOfN(n, Gen.alphaChar).map(_.mkString)
-    } yield chars.mkString
+      s <- Gen.listOfN(n, Gen.alphaChar).map(_.mkString)
+    } yield s
 
   def genNonEmptyString(maxLength: Int): Gen[String] =
     for {
       n <- Gen.chooseNum(1, maxLength)
-      chars <- Gen.listOfN(n, genFor[Char])
-    } yield chars.mkString
+      s <- Gen.listOfN(n, Gen.asciiChar).map(_.mkString)
+    } yield s
 
   def genFor[A: Arbitrary]: Gen[A] =
     implicitly[Arbitrary[A]].arbitrary
+
 }
 
 ////
 
-trait TestSupportScalacheck {
+trait TestSupportScalacheck extends DefaultRuntime {
 
-  // TODO ZIOify
-//  // ScalaCheck forAll except for IO
-//  def forAllIO[T1, P](
-//    g1: Gen[T1]
-//  )(f: T1 => IO[P])(implicit p: P => Prop, s1: Shrink[T1], pp1: T1 => Pretty): Prop =
-//    forAll(g1) {
-//      t1 =>
-//        f(t1).unsafeRunSync()
-//    }
-
-  //  // TODO apply params
-  //  val parametersForGeneratedTests: Test.Parameters =
-  //    Test.Parameters.default.withMinSuccessfulTests(1)
+  // ScalaCheck forAll except for ZIO
+  def forAllZIO[T1, P, E](g1: Gen[T1])(f: T1 => ZIO[Environment, E, P])(
+    implicit p: P => Prop,
+    s1: Shrink[T1],
+    pp1: T1 => Pretty
+  ): Prop =
+    forAll(g1) {
+      t1 =>
+        unsafeRun(f(t1))
+    }
 
   def simpleTest(condition: => Boolean): Prop =
     forAll(implicitly[Arbitrary[Int]].arbitrary) {
@@ -141,44 +125,14 @@ trait TestSupportScalacheck {
         condition
     }
 
-//  def simpleTestIO[T1, P](condition: => IO[Boolean]): Prop =
-//    forAll(implicitly[Arbitrary[Int]].arbitrary) {
-//      _ =>
-//        condition.unsafeRunSync()
-//    }
-
-}
-
-////
-
-final class IOSyntaxSafeOpsTaskTesting[E, A](t: IO[E, A]) extends DefaultRuntime {
-
-  def runSync(): Either[List[E], A] =
-    unsafeRunSync(t)
-      .fold(
-        _.fold(List[E]()) {
-          case (errors, cause) => errors ++ cause.failures
-        }.asLeft,
-        _.asRight
-      )
-
-}
-
-trait ToIOSyntaxSafeOpsTaskTesting {
-  implicit def implToIOSyntaxSafeOpsTaskTesting[E, A](
-    t: IO[E, A]
-  ): IOSyntaxSafeOpsTaskTesting[E, A] =
-    new IOSyntaxSafeOpsTaskTesting[E, A](t)
 }
 
 ////
 
 trait TestSupport
   extends ToTestSupportOps
-  with ToTestSupportEqOps
-//  with ToTestSupportIOOps
+  with ToTestSupportZIOOps
   with TestSupportGens
   with TestSupportScalacheck
-  with ToIOSyntaxSafeOpsTaskTesting // TODO remove after ZIO
 
 object testsupportinstances extends TestSupport
