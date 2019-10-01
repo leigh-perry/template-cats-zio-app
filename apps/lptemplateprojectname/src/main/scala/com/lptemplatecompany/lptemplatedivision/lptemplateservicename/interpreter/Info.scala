@@ -10,7 +10,9 @@ import cats.syntax.functor._
 import cats.syntax.traverse._
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
+import zio.UIO
+import zio.interop.catz._
 
 /**
  * The real-infrastructure implementation for logging of application information, typically at
@@ -18,32 +20,32 @@ import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
  *
  * C = config class
  */
-class Info[F[_]: Monad, C](cfg: C, log: Logger[F]) extends InfoAlg[F] {
+class Info[C](cfg: C, log: Log) extends InfoAlg[UIO] {
 
   import scala.collection.JavaConverters._
 
-  override def systemProperties: F[Map[String, String]] =
-    System.getProperties.asScala.toMap.pure[F]
+  override def systemProperties: UIO[Map[String, String]] =
+    System.getProperties.asScala.toMap.pure[UIO]
 
-  override def environmentVariables: F[Map[String, String]] =
-    System.getenv.asScala.toMap.pure[F]
+  override def environmentVariables: UIO[Map[String, String]] =
+    System.getenv.asScala.toMap.pure[UIO]
 
-  override def logBanner: F[Unit] =
+  override def logBanner: UIO[Unit] =
     log.info(banner)
 
-  override def logMap(m: Map[String, String]): F[Unit] =
+  override def logMap(m: Map[String, String]): UIO[Unit] =
     m.toList
       .sortBy(_._1)
       .traverse(e => log.info(formatMapEntry(e)))
-      .void
+      .unit
 
-  override def logConfig: F[Unit] =
+  override def logConfig: UIO[Unit] =
     log.info(s"Configuration $cfg")
 
-  override def logSeparator: F[Unit] =
+  override def logSeparator: UIO[Unit] =
     log.info(separator)
 
-  override def logTitle(title: String): F[Unit] =
+  override def logTitle(title: String): UIO[Unit] =
     log.info(title)
 
   private val banner =
@@ -69,7 +71,7 @@ class Info[F[_]: Monad, C](cfg: C, log: Logger[F]) extends InfoAlg[F] {
 }
 
 object Info {
-  def of[F[_]: Monad, C](cfg: C, log: Logger[F]): F[Info[F, C]] =
+  def of[F[_]: Monad, C](cfg: C, log: Log): F[Info[C]] =
     new Info(cfg, log)
       .pure[F]
 }

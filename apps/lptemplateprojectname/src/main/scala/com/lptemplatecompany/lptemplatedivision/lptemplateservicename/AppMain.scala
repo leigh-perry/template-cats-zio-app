@@ -1,47 +1,211 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.{ Config, Context }
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
-import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
-import zio.interop.catz._
-import zio.{ App, IO, Task, UIO, ZIO }
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
+import zio.blocking.Blocking
+import zio.{ App, ZIO }
+
+//// Stubs
+
+trait SparkSession {
+  def sql(value: "select * from SOMETHING"): DataFrame =
+    new DataFrame {}
+
+  def version: String = "dummy"
+
+}
+trait DataFrame
+
+////
+
+final case class AppConfig(kafkaBrokers: String, schemaRegistryAddr: String)
+
+trait AppConfigError
 
 /**
- * All resources, such as temporary directories and the expanded files, are cleaned up when no longer
- * required. This is implemented using `zio.Managed`.
+ * Support for loading stuff the app needs in order to get started
  */
-object AppMain extends App with AIOSyntax {
+object Bootstrap {
+  trait ConfigSupport {
+    def load: ZIO[Any, AppConfigError, AppConfig]
+  }
+
+  object ConfigSupport {
+    trait Live extends ConfigSupport {
+      override def load: ZIO[Any, AppConfigError, AppConfig] =
+        ZIO.succeed(
+          AppConfig(
+            kafkaBrokers = "localhost:9092",
+            schemaRegistryAddr = "http://localhost:8081"
+          )
+        )
+    }
+
+    object Live extends Live
+  }
+
+  object TestConfiguration {
+    trait Test extends ConfigSupport {
+      override def load: ZIO[Any, AppConfigError, AppConfig] =
+        ZIO.succeed(
+          AppConfig(
+            kafkaBrokers = "localhost:9092",
+            schemaRegistryAddr = "http://localhost:8081"
+          )
+        )
+    }
+
+    object Test extends Test
+  }
+
+  ////
+
+  trait LogSupport {
+    def load(prefix: String): ZIO[Any, Nothing, Log]
+  }
+
+  object LogSupport {
+    trait Live extends LogSupport {
+      override def load(prefix: String): ZIO[Any, Nothing, Log] =
+        Log.slf4j(prefix)
+    }
+
+    object Live extends Live
+  }
+
+  object TestLogSupport {
+    trait Test extends LogSupport {
+      override def load(prefix: String): ZIO[Any, Nothing, Log] =
+        Log.slf4j(prefix)
+    }
+
+    object Test extends Test
+  }
+
+  ////
+
+  trait SparkSupport {
+    def sparkSession(name: String): ZIO[Blocking, Throwable, SparkSession]
+  }
+
+  object SparkSupport {
+    trait Live extends SparkSupport {
+      override def sparkSession(name: String): ZIO[Blocking, Throwable, SparkSession] =
+        ZIO.accessM {
+          _.blocking
+            .effectBlocking(
+              //SparkSession.builder().appName(name).enableHiveSupport().getOrCreate()
+              new SparkSession {}
+            )
+        }
+    }
+
+    object Live extends Live
+  }
+
+  object TestSparkSupport {
+    trait Test extends SparkSupport {
+      override def sparkSession(name: String): ZIO[Blocking, Throwable, SparkSession] =
+        zio
+          .blocking
+          .effectBlocking(
+            //SparkSession.builder().appName(name).master("local").getOrCreate()
+            new SparkSession {}
+          )
+    }
+
+    object Test extends Test
+  }
+
+}
+
+////
+
+/**
+ * Stuff loaded in the bootstrap phase and is now available to the app while it is running
+ */
+object AppRuntime {
+
+  trait Config {
+    val cfg: AppConfig
+  }
+
+  trait Logging {
+    val log: Log
+  }
+
+  trait Spark {
+    val sparkSession: SparkSession
+  }
+
+  case class All(
+    cfg: AppConfig,
+    log: Log,
+    sparkSession: SparkSession
+  ) extends Config
+    with Logging
+    with Spark
+
+}
+
+////
+
+object Main extends App {
+
+  sealed trait MainAppError
+  final case class ConfigLoadError(message: AppConfigError) extends MainAppError
+  final case class ExceptionEncountered(exception: Throwable) extends MainAppError
 
   override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
-    program
-      .fold(
-        e => exitWith(1, s"Application failed: $e"),
-        _ => exitWith(0, "Application terminated with no error indication")
+    for {
+      log <- Log.slf4j(prefix = "TESTING")
+      r <- resolvedProgram(log).foldM(
+        e => log.error(s"Application failed: $e") *> ZIO.succeed(1),
+        _ => log.info("Application terminated with no error indication") *> ZIO.succeed(0)
       )
+    } yield r
 
-  /**
-   * To prevent repeated evaluation of environmental dependencies, pre-compute them and
-   * build services from these instances
-   */
-  private def program: AIO[Unit] =
+  final case class SomeResult()
+
+  def resolvedProgram(log: Log): ZIO[Any, MainAppError, Unit] =
     for {
-      cfg <- Config.load
-      log <- Logger.slf4j[UIO, Task].asAIO
-      info <- Info.of[AIO, Config](cfg, log)
-      _ <- info.logEnvironment
-      _ <- log.info(cfg.toString)
-      outcome <- runApp(cfg, log)
-    } yield outcome
+      // Config is loaded separately in order to provide to `program`
+      cfg <- Bootstrap.ConfigSupport.Live.load.mapError(ConfigLoadError)
+      sparkSession <- Bootstrap
+        .SparkSupport
+        .Live
+        .sparkSession("TESTING")
+        .mapError(ExceptionEncountered)
+        .provide(Blocking.Live)
+      resolved <- program.provide(
+        new AppRuntime.All(cfg, log, sparkSession) with Blocking.Live {}
+      )
+    } yield resolved
 
-  private def runApp(cfg: Config, log: Logger[AIO]): IO[AppError, Unit] =
-    for {
-      ctx <- AIO(Context.create(cfg, log))
-      _ <- ctx.use(_.service.run)
-    } yield ()
+  def program: ZIO[
+    AppRuntime.Config with AppRuntime.Logging with AppRuntime.Spark with Blocking,
+    MainAppError,
+    Unit
+  ] =
+    ZIO.accessM {
+      env =>
+        for {
+          r <- doSomethingBlocking(env.cfg)
+          _ <- doSomethingSlow(env.cfg).mapError(ExceptionEncountered)
+          _ <- env.log.info(env.sparkSession.version)
+        } yield ()
+    }
 
-  private def exitWith(code: Int, message: String) = {
-    println(message)
-    code
-  }
+  def doSomethingSlow(cfg: AppConfig): ZIO[AppRuntime.Spark, Throwable, DataFrame] =
+    ZIO.accessM {
+      env =>
+        ZIO.effect(env.sparkSession.sql("select * from SOMETHING"))
+    }
+
+  def doSomethingBlocking(cfg: AppConfig): ZIO[Blocking, MainAppError, SomeResult] =
+    zio
+      .blocking
+      .effectBlocking {
+        Thread.sleep(1000)
+      }
+      .bimap(ExceptionEncountered, _ => SomeResult())
 }

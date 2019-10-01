@@ -3,7 +3,7 @@ package config
 
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.ServiceAlg
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Service
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
 import zio.Managed
 
 /**
@@ -15,7 +15,7 @@ final case class Context[F[_]] private (
 )
 
 object Context {
-  def create(cfg: Config, log: Logger[AIO]): Managed[AppError, Context[AIO]] =
+  def create(cfg: Config, log: Log): Managed[AppError, Context[AIO]] =
     for {
       service <- Service.managed(cfg, log)
     } yield new Context[AIO](service)

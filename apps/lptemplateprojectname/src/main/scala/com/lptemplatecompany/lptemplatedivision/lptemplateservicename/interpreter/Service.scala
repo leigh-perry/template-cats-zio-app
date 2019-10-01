@@ -6,14 +6,14 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.algebra.Se
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.Config
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.syntax.AIOSyntax
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Logger
+import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
 import zio.interop.catz._
 import zio.{ IO, Managed, ZIO }
 
 /**
  * The real-infrastructure implementation for the top level service
  */
-class Service private (cfg: Config, log: Logger[AIO], tempDir: String)
+class Service private (cfg: Config, log: Log, tempDir: String)
   extends ServiceAlg[AIO]
   with AIOSyntax {
 
@@ -27,7 +27,7 @@ class Service private (cfg: Config, log: Logger[AIO], tempDir: String)
 }
 
 object Service {
-  def managed(cfg: Config, log: Logger[AIO]): Managed[AppError, ServiceAlg[AIO]] =
+  def managed(cfg: Config, log: Log): Managed[AppError, ServiceAlg[AIO]] =
     for {
       tempDir <- FileSystem.tempDirectoryScope(log)
       svc <- Managed.fromEffect(ZIO.succeed(new Service(cfg, log, tempDir)))
@@ -44,7 +44,7 @@ import cats.syntax.monadError._
 
 object FileSystem extends AIOSyntax {
 
-  def tempDirectoryScope(log: Logger[AIO]): Managed[AppError, String] =
+  def tempDirectoryScope(log: Log): Managed[AppError, String] =
     Apps.managed(
       for {
         file <- FileSystem.createTempDir
