@@ -8,10 +8,10 @@ import zio.{ App, ZIO }
 //// Stubs
 
 trait SparkSession {
-  def sql(value: "select * from SOMETHING"): DataFrame =
+  def sql(value: String): DataFrame =
     new DataFrame {}
 
-  def version: String = 
+  def version: String =
     "dummy"
 
 }
@@ -179,19 +179,19 @@ object Main extends App {
     ZIO.accessM {
       env =>
         for {
-          r <- doSomethingBlocking(env.cfg)
-          _ <- doSomethingSlow(env.cfg).mapError(ExceptionEncountered)
+          r <- doSomethingBlocking
+          _ <- doSomethingWithSpark.mapError(ExceptionEncountered)
           _ <- env.log.info(env.sparkSession.version)
         } yield ()
     }
 
-  def doSomethingSlow(cfg: AppConfig): ZIO[AppRuntime.Spark, Throwable, DataFrame] =
+  def doSomethingWithSpark: ZIO[AppRuntime.Config with AppRuntime.Spark, Throwable, DataFrame] =
     ZIO.accessM {
       env =>
-        ZIO.effect(env.sparkSession.sql("select * from SOMETHING"))
+        ZIO.effect(env.sparkSession.sql(s"select * from Kafka ${env.cfg.kafka.properties}"))
     }
 
-  def doSomethingBlocking(cfg: AppConfig): ZIO[Blocking, MainAppError, SomeResult] =
+  def doSomethingBlocking: ZIO[Blocking, MainAppError, SomeResult] =
     zio
       .blocking
       .effectBlocking {
