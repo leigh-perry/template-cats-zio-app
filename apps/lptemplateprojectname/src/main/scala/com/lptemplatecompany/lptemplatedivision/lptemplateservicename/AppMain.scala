@@ -13,8 +13,8 @@ trait SparkSession {
 
   def version: String =
     "dummy"
-
 }
+
 trait DataFrame
 
 ////
