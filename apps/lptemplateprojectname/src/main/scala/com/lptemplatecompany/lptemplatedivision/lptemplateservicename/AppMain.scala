@@ -11,7 +11,6 @@ final case class ProgramConfig(inputPath: String, outputPath: String)
 
 object AppMain extends App {
 
-  // TODO rename
   final case class AppEnv(logging: Logging.Service, config: Config.Service, spark: Spark.Service)
     extends Logging
     with Config
@@ -170,10 +169,10 @@ object Application {
     } yield ()
 
   // TODO remove Throwable
-  val execute: ZIO[Logging with Spark with Config with Blocking, Throwable, Unit] =
+  val execute: ZIO[Logging with Spark with Config with Blocking, AppError, Unit] =
     for {
-      _ <- logSomething
-      _ <- runSparkJob
-      _ <- processData
+      _ <- logSomething.mapError(AppError.exception)
+      _ <- runSparkJob.mapError(AppError.exception)
+      _ <- processData.mapError(AppError.exception)
     } yield ()
 }
