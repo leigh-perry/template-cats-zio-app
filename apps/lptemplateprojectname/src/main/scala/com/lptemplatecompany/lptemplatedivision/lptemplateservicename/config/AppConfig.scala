@@ -28,7 +28,7 @@ object AppConfig {
     val task: Task[Either[NonEmptyChain[ConfiguredError], AppConfig]] =
       for {
         env <- Environment.fromEnvVars[Task]
-        logenv <- Environment.logging[Task](env, Environment.printer)
+        logenv = Environment.logging[Task](env, Environment.printer[Task])
         cio <- Configured[Task, AppConfig]("LPTEMPLATESERVICENAME").run(logenv)
       } yield cio.toEither
 
