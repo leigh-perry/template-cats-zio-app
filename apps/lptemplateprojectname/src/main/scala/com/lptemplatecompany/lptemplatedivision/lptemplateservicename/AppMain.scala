@@ -1,12 +1,13 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
+import cats.syntax.option._
+import com.leighperry.log4zio.Log
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.AppConfig
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
 import zio.blocking.Blocking
+import zio.interop.catz._
 import zio.system.System
 import zio.{ App, UIO, ZIO }
-import zio.interop.catz._
 
 final case class ProgramConfig(inputPath: String, outputPath: String)
 
@@ -21,7 +22,7 @@ object AppMain extends App {
   val appName = "LPTEMPLATESERVICENAME"
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
     for {
-      logsvc <- Log.console // TODO (appName)
+      logsvc <- Log.console(appName.some)
       log = logsvc.log
 
       pgm = for {

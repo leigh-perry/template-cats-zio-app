@@ -7,9 +7,9 @@ import cats.instances.order._
 import cats.instances.string._
 import cats.syntax.applicative._
 import cats.syntax.traverse._
+import com.leighperry.log4zio.Log
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
-import com.lptemplatecompany.lptemplatedivision.shared.log4zio.Log
 import zio.UIO
 import zio.interop.catz._
 

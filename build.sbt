@@ -101,6 +101,7 @@ lazy val lptemplateprojectname =
     .settings(
       libraryDependencies ++=
         Seq(
+          log4zio
           )
     )
     .enablePlugins(BuildInfoPlugin)

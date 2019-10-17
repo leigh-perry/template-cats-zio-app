@@ -11,8 +11,8 @@ object Dependencies {
     val ziocats = "2.0.0.0-RC6"
 
     val logback = "1.2.3"
-    val log4cats = "1.0.0"
     val conduction = "0.4.2"
+    val log4zio = "0.1.1+1-25004d49-SNAPSHOT"
 
     val scalacheck = "1.14.2"
   }
@@ -25,6 +25,7 @@ object Dependencies {
 
   val logback = "ch.qos.logback" % "logback-classic" % Version.logback
   val conduction = "com.github.leigh-perry" %% "conduction-core" % Version.conduction
+  val log4zio = "com.github.leigh-perry" %% "log4zio-slf4j" % Version.log4zio
 
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
   val catsLaws = "org.typelevel" %% "cats-laws" % Version.cats
