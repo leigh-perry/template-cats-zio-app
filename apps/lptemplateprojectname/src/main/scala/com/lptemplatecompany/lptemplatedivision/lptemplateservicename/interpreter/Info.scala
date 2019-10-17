@@ -19,7 +19,7 @@ import zio.interop.catz._
  *
  * C = config class
  */
-class Info[C](cfg: C, log: Log) extends InfoAlg[UIO] {
+class Info[C](cfg: C, log: Log.Service) extends InfoAlg[UIO] {
 
   import scala.jdk.CollectionConverters._
 
@@ -70,7 +70,7 @@ class Info[C](cfg: C, log: Log) extends InfoAlg[UIO] {
 }
 
 object Info {
-  def of[F[_]: Monad, C](cfg: C, log: Log): F[Info[C]] =
+  def of[F[_]: Monad, C](cfg: C, log: Log.Service): F[Info[C]] =
     new Info(cfg, log)
       .pure[F]
 }
