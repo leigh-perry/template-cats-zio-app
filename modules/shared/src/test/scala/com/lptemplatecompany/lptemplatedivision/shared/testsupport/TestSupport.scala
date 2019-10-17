@@ -109,7 +109,7 @@ trait TestSupportGens {
 trait TestSupportScalacheck extends DefaultRuntime {
 
   // ScalaCheck forAll except for ZIO
-  def forAllZIO[T1, P, E](g1: Gen[T1])(f: T1 => ZIO[Environment, E, P])(
+  def forAllZIO[T1, P, E](g1: Gen[T1])(f: T1 => ZIO[zio.ZEnv, E, P])(
     implicit p: P => Prop,
     s1: Shrink[T1],
     pp1: T1 => Pretty

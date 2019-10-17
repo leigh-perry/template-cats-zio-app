@@ -19,7 +19,7 @@ object AppMain extends App {
     with Blocking.Live
 
   val appName = "LPTEMPLATESERVICENAME"
-  override def run(args: List[String]): ZIO[Environment, Nothing, Int] =
+  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
     for {
       logsvc <- Log.console // TODO (appName)
       log = logsvc.log

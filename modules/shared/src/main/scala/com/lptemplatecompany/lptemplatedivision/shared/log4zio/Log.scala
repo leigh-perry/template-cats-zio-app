@@ -125,7 +125,7 @@ object Log {
 
 object FreeV extends App {
 
-  def run(args: List[String]): ZIO[Environment, Nothing, Int] = {
+  def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] = {
 
     val program: ZIO[Log, Throwable, Unit] =
       ZIO.accessM[Log] {
