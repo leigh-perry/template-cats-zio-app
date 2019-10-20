@@ -79,7 +79,7 @@ object KafkaSchemaRegistryUrl {
     Conversion[String].map(KafkaSchemaRegistryUrl.apply)
 }
 
-case class PropertyValue(name: String, value: String)
+final case class PropertyValue(name: String, value: String)
 
 object PropertyValue {
   implicit def configured[F[_]](implicit F: Monad[F]): Configured[F, PropertyValue] =
