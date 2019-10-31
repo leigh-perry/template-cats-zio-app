@@ -4,7 +4,7 @@ jdk:
 
 stages:
   - name: test
-  - name: release
+#  - name: release
     if: (branch = master AND type = push) OR (tag IS present)
 
 jobs:
@@ -12,9 +12,9 @@ jobs:
     - stage: test
       script: sbt +compile +test:compile +test
 
-    # run ci-release only if previous stages passed
-    - stage: release
-      script: sbt ci-release
+#    # run ci-release only if previous stages passed
+#    - stage: release
+#      script: sbt ci-release
 
 cache:
   directories:
