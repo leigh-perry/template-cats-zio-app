@@ -8,7 +8,7 @@ object Dependencies {
     val catsEffect = "2.0.0"
 
     val zio = "1.0.0-RC16"
-    val ziocats = "2.0.0.0-RC6"
+    val ziocats = "2.0.0.0-RC7"
 
     val logback = "1.2.3"
     val conduction = "0.4.2"
