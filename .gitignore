@@ -10,6 +10,8 @@ temp*.json
 cassandra_data/
 custom-plugins/
 .idea
+.bloop
+.metals
 
 # Created by .ignore support plugin (hsz.mobi)
 ### JetBrains template
