@@ -3,7 +3,7 @@ package shared
 
 import java.io.{ PrintWriter, StringWriter }
 
-object Apps extends GenIOSyntax {
+object Apps {
 
   def className(o: AnyRef): String =
     o.getClass.getSimpleName.replaceAll("\\$", "")
