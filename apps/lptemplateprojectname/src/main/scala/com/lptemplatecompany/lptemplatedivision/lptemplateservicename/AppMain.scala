@@ -152,7 +152,6 @@ object Application {
     for {
       log <- Log.stringLog
       cfg <- ZIO.accessM[Config](_.config.config)
-      _ <- logSomething.mapError(AppError.exception)
       info <- Info.of[UIO, AppConfig](cfg, log)
       _ <- info.logEnvironment
       _ <- runSparkJob.mapError(AppError.exception)
