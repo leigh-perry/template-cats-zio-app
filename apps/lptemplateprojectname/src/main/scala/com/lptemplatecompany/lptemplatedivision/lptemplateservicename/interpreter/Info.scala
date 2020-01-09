@@ -1,5 +1,4 @@
-package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
-package interpreter
+package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter
 
 import cats.Monad
 import cats.instances.list._
@@ -8,6 +7,7 @@ import cats.instances.string._
 import cats.syntax.applicative._
 import cats.syntax.traverse._
 import com.leighperry.log4zio.Log
+import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.BuildInfo
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import com.lptemplatecompany.lptemplatedivision.shared.algebra.InfoAlg
 import zio.UIO

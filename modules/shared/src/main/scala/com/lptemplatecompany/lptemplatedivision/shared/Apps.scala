@@ -1,5 +1,4 @@
-package com.lptemplatecompany.lptemplatedivision
-package shared
+package com.lptemplatecompany.lptemplatedivision.shared
 
 import java.io.{ PrintWriter, StringWriter }
 

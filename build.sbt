@@ -74,7 +74,7 @@ lazy val shared =
           zio,
           ziocats,
           logback,
-          conduction
+          zioConfig
         )
     )
     .enablePlugins(BuildInfoPlugin)

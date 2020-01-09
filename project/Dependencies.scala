@@ -8,10 +8,10 @@ object Dependencies {
     val catsEffect = "2.0.0"
 
     val zio = "1.0.0-RC17"
+    val zioConfig = "1.0.0-RC9-1"
     val ziocats = "2.0.0.0-RC10"
 
     val logback = "1.2.3"
-    val conduction = "0.4.2"
     val log4zio = "0.2.5"
 
     val scalacheck = "1.14.3"
@@ -21,10 +21,10 @@ object Dependencies {
   val catsEffect = "org.typelevel" %% "cats-effect" % Version.catsEffect
 
   val zio = "dev.zio" %% "zio" % Version.zio
+  val zioConfig = "dev.zio" %% "zio-config" % Version.zioConfig
   val ziocats = "dev.zio" %% "zio-interop-cats" % Version.ziocats
 
   val logback = "ch.qos.logback" % "logback-classic" % Version.logback
-  val conduction = "com.github.leigh-perry" %% "conduction-core" % Version.conduction
   val log4zio = "com.github.leigh-perry" %% "log4zio-slf4j" % Version.log4zio
 
   val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
