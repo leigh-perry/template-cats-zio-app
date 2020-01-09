@@ -97,16 +97,18 @@ object Spark {
 
 // The core application
 object Application {
+  import Log.stringLog
+
   val logProgramConfig: ZIO[Config[AppConfig] with SafeLog[String], Nothing, Unit] =
     for {
       r <- config[AppConfig]
-      log <- Log.stringLog
+      log <- stringLog
       _ <- log.info(s"Executing parameters ${r.inputPath} and ${r.outputPath} without sparkSession")
     } yield ()
 
   val runSparkJob: ZIO[Spark with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
-      log <- Log.stringLog
+      log <- stringLog
       session <- ZIO.accessM[Spark](_.spark.spark)
       _ <- log.info(s"Executing something with spark ${session.version}")
       result <- zio.blocking.effectBlocking(session.slowOp("SELECT something"))
@@ -117,7 +119,7 @@ object Application {
     for {
       cfg <- config[AppConfig]
       spark <- ZIO.accessM[Spark](_.spark.spark)
-      log <- Log.stringLog
+      log <- stringLog
       _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.version}")
     } yield ()
 
@@ -125,7 +127,7 @@ object Application {
 
   val execute: ZIO[Spark with Config[AppConfig] with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
-      log <- Log.stringLog
+      log <- stringLog
       cfg <- config[AppConfig]
       info <- Info.of[UIO, AppConfig](cfg, log)
       _ <- info.logEnvironment
