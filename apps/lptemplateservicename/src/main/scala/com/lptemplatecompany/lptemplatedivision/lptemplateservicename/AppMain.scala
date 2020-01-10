@@ -60,7 +60,7 @@ trait Spark {
 
 object Spark {
   trait Service {
-    def spark: UIO[SparkSession]
+    def sparkSession: UIO[SparkSession]
   }
 
   def make(session: => SparkSession): ZIO[Blocking, Throwable, Spark] =
@@ -68,12 +68,12 @@ object Spark {
       .blocking
       .effectBlocking(session)
       .map(
-        sparkSession =>
+        session =>
           new Spark {
             override def spark: Service =
               new Service {
-                override def spark: UIO[SparkSession] =
-                  ZIO.succeed(sparkSession)
+                override def sparkSession: UIO[SparkSession] =
+                  ZIO.succeed(session)
               }
           }
       )
@@ -101,25 +101,25 @@ object Application {
 
   val logProgramConfig: ZIO[Config[AppConfig] with SafeLog[String], Nothing, Unit] =
     for {
-      r <- config[AppConfig]
       log <- stringLog
-      _ <- log.info(s"Executing parameters ${r.inputPath} and ${r.outputPath} without sparkSession")
+      cfg <- config[AppConfig]
+      _ <- log.info(s"Executing parameters ${cfg.inputPath} and ${cfg.outputPath} without sparkSession")
     } yield ()
 
   val runSparkJob: ZIO[Spark with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
       log <- stringLog
-      session <- ZIO.accessM[Spark](_.spark.spark)
-      _ <- log.info(s"Executing something with spark ${session.version}")
-      result <- zio.blocking.effectBlocking(session.slowOp("SELECT something"))
-      _ <- log.info(s"Executed something with spark ${session.version}: $result")
+      spark <- ZIO.accessM[Spark](_.spark.sparkSession)
+      _ <- log.info(s"Executing something with spark ${spark.version}")
+      result <- zio.blocking.effectBlocking(spark.slowOp("SELECT something"))
+      _ <- log.info(s"Executed something with spark ${spark.version}: $result")
     } yield ()
 
   val processData: ZIO[Spark with Config[AppConfig] with SafeLog[String], Throwable, Unit] =
     for {
-      cfg <- config[AppConfig]
-      spark <- ZIO.accessM[Spark](_.spark.spark)
       log <- stringLog
+      cfg <- config[AppConfig]
+      spark <- ZIO.accessM[Spark](_.spark.sparkSession)
       _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.version}")
     } yield ()
 

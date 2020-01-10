@@ -96,7 +96,7 @@ lazy val shared =
     )
 
 lazy val lptemplateprojectname =
-  app("lptemplateprojectname")
+  app("lptemplateservicename")
     .dependsOn(shared % testDependencies)
     .settings(
       libraryDependencies ++=
