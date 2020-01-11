@@ -6,24 +6,24 @@ val Scala_212 = "2.12.10"
 
 ////
 
-val projectName = "lptemplatedivision-lptemplateservicename"
+val projectName = "lptemplatedivision-lptemplateprojectname"
 
-inThisBuild(
-  List(
-    organization := "com.github.leigh-perry",
-    homepage := Some(url("https://github.com/leigh-perry/${projectName.toLowerCase}")),
-    licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-    developers :=
-      List(
-        Developer(
-          "leigh-perry",
-          "Leigh Perry",
-          "lperry.breakpoint@gmail.com",
-          url("https://leigh-perry.github.io")
-        )
-      )
-  )
-)
+//inThisBuild(
+//  List(
+//    organization := "com.github.leigh-perry",
+//    homepage := Some(url("https://github.com/leigh-perry/${projectName.toLowerCase}")),
+//    licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+//    developers :=
+//      List(
+//        Developer(
+//          "leigh-perry",
+//          "Leigh Perry",
+//          "lperry.breakpoint@gmail.com",
+//          url("https://leigh-perry.github.io")
+//        )
+//      )
+//  )
+//)
 
 lazy val gitCommitAuthor: String = {
   import sys.process._
@@ -51,12 +51,13 @@ lazy val commonSettings =
     scalaVersion := Scala_213,
     scalacOptions ++= commonScalacOptions(scalaVersion.value),
     fork in Test := true,
-    testFrameworks += new TestFramework("org.scalacheck.ScalaCheckFramework"),
+    testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
     name := projectName,
     updateOptions := updateOptions.value.withGigahorse(false),
     libraryDependencies ++=
       Seq(
-        scalacheck % "test"
+        zioTest % Test,
+        zioTestSbt % Test
       ) ++ compilerPlugins
   )
 
@@ -95,7 +96,7 @@ lazy val shared =
       buildInfoPackage := "com.lptemplatecompany.lptemplatedivision.lptemplateservicename"
     )
 
-lazy val lptemplateprojectname =
+lazy val lptemplateservicename =
   app("lptemplateservicename")
     .dependsOn(shared % testDependencies)
     .settings(
@@ -106,7 +107,7 @@ lazy val lptemplateprojectname =
     )
     .enablePlugins(BuildInfoPlugin)
 
-lazy val allModules = List(shared, lptemplateprojectname)
+lazy val allModules = List(shared, lptemplateservicename)
 
 lazy val root =
   project

@@ -1,13 +1,21 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename
 
-import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
-import org.scalacheck.Properties
-import zio.ZIO
+import com.lptemplatecompany.lptemplatedivision.shared.testsupport.BaseSpec
+import zio.test.Assertion._
+import zio.test.{ check, _ }
 
-object SomeTest extends Properties("SomeTest") with TestSupport {
-  property("abs") = forAllZIO(genFor[Int].filter(_ != Int.MinValue)) {
-    i =>
-      ZIO.succeed(Math.abs(i) >= 0)
-  }
-
-}
+object AppsTest
+  extends BaseSpec(
+    suite("AppsTest")(
+      testM("dummy property test") {
+        check(
+          Gen
+            .anyInt
+            .filter(_ != Int.MinValue)
+        ) {
+          i =>
+            assert(Math.abs(i), isGreaterThan(0))
+        }
+      }
+    )
+  )

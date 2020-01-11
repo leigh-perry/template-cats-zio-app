@@ -1,11 +1,14 @@
 package com.lptemplatecompany.lptemplatedivision.shared
 
-import com.lptemplatecompany.lptemplatedivision.shared.testsupport.TestSupport
-import org.scalacheck.Properties
+import com.lptemplatecompany.lptemplatedivision.shared.testsupport.BaseSpec
+import zio.test.Assertion._
+import zio.test._
 
-object AppsTest extends Properties("AppsTest") with TestSupport {
-  property("className") = simpleTest {
-    Apps.className(Apps).shouldBe("Apps") && Apps.className(AppsTest).shouldBe("AppsTest")
-  }
-
-}
+object AppsTest
+  extends BaseSpec(
+    suite("AppsTest")(
+      test("className") {
+        assert(Apps.className(Apps), equalTo("Apps"))
+      }
+    )
+  )

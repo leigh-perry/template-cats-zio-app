@@ -13,8 +13,6 @@ object Dependencies {
 
     val logback = "1.2.3"
     val log4zio = "0.2.5"
-
-    val scalacheck = "1.14.3"
   }
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
@@ -27,6 +25,6 @@ object Dependencies {
   val logback = "ch.qos.logback" % "logback-classic" % Version.logback
   val log4zio = "com.github.leigh-perry" %% "log4zio-slf4j" % Version.log4zio
 
-  val scalacheck = "org.scalacheck" %% "scalacheck" % Version.scalacheck
-  val catsLaws = "org.typelevel" %% "cats-laws" % Version.cats
+  val zioTest = "dev.zio" %% "zio-test" % Version.zio
+  val zioTestSbt = "dev.zio" %% "zio-test-sbt" % Version.zio
 }
