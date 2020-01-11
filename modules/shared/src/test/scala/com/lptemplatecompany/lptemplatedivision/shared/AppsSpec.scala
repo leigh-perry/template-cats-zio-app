@@ -4,7 +4,7 @@ import com.lptemplatecompany.lptemplatedivision.shared.testsupport.BaseSpec
 import zio.test.Assertion._
 import zio.test._
 
-object AppsTest
+object AppsSpec
   extends BaseSpec(
     suite("AppsTest")(
       test("className") {

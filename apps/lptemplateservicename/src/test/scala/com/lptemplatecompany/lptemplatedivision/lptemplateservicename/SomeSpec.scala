@@ -4,9 +4,9 @@ import com.lptemplatecompany.lptemplatedivision.shared.testsupport.BaseSpec
 import zio.test.Assertion._
 import zio.test.{ check, _ }
 
-object AppsTest
+object SomeSpec
   extends BaseSpec(
-    suite("AppsTest")(
+    suite("Some tests or other")(
       testM("dummy property test") {
         check(
           Gen
