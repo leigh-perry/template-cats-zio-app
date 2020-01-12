@@ -102,7 +102,7 @@ object Application {
   val logProgramConfig: ZIO[Config[AppConfig] with SafeLog[String], Nothing, Unit] =
     for {
       log <- stringLog
-      cfg <- config[AppConfig]
+      cfg <- zio.config.config[AppConfig]
       _ <- log.info(s"Executing parameters ${cfg.inputPath} and ${cfg.outputPath} without sparkSession")
     } yield ()
 
@@ -118,7 +118,7 @@ object Application {
   val processData: ZIO[Spark with Config[AppConfig] with SafeLog[String], Throwable, Unit] =
     for {
       log <- stringLog
-      cfg <- config[AppConfig]
+      cfg <- zio.config.config[AppConfig]
       spark <- ZIO.accessM[Spark](_.spark.sparkSession)
       _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.version}")
     } yield ()
@@ -128,7 +128,7 @@ object Application {
   val execute: ZIO[Spark with Config[AppConfig] with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
       log <- stringLog
-      cfg <- config[AppConfig]
+      cfg <- zio.config.config[AppConfig]
       info <- Info.of[UIO, AppConfig](cfg, log)
       _ <- info.logEnvironment
       _ <- logProgramConfig
