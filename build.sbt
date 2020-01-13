@@ -116,8 +116,9 @@ lazy val root =
     .in(file("."))
     .settings(commonSettings)
     .settings(skip in publish := true, crossScalaVersions := List())
-    .aggregate((allModules).map(x => x: ProjectReference): _*)
-    //.enablePlugins(sbtdocker.DockerPlugin)
+    .aggregate(allModules.map(x => x: ProjectReference): _*)
+    .enablePlugins(sbtdocker.DockerPlugin)
+    .settings(dockerSettings)
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("fmtcheck", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
@@ -196,26 +197,29 @@ assemblyMergeStrategy in assembly := {
 // Create assembly only for top level project
 aggregate in assembly := false
 
-// support docker task ("sbt docker" command)
-enablePlugins(DockerPlugin)
-
-dockerfile in docker := {
-  // The assembly task generates a fat JAR file
-  val artifact: File = assembly.value
-  val artifactTargetPath = s"/app/${artifact.name}"
-
-  new Dockerfile {
-    from("openjdk:11-jre-slim")
-    add(new File("docker-components/run_app.sh"), "/app/run_app.sh")
-    add(artifact, artifactTargetPath)
-    entryPoint("/app/run_app.sh", artifactTargetPath)
-  }
-}
-
-buildOptions in docker := BuildOptions(cache = false)
-
-imageNames in docker :=
+lazy val dockerSettings =
   Seq(
-    // Sets the latest tag
-    ImageName(s"${organization.value}/${projectName}:latest")
+    dockerfile in docker := {
+      // The assembly task generates a fat JAR file
+      val artifact: File = assembly.value
+      val artifactTargetPath = s"/app/${artifact.name}"
+
+      new Dockerfile {
+        from("openjdk:11-jre-slim")
+        add(new File("docker-components/run_app.sh"), "/app/run_app.sh")
+        add(artifact, artifactTargetPath)
+        entryPoint("/app/run_app.sh", artifactTargetPath)
+      }
+    },
+    buildOptions in docker := BuildOptions(cache = false),
+    imageNames in docker :=
+      Seq(
+        // Sets the latest tag
+        ImageName(s"${organization.value}/$projectName:latest"),
+        // Sets a name with a tag that contains the project version
+        ImageName(
+          repository = name.value,
+          tag = Some(s"v${version.value}")
+        )
+      )
   )
