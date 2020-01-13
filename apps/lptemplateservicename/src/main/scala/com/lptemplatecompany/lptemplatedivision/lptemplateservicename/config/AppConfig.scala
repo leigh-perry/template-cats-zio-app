@@ -11,7 +11,7 @@ final case class AppConfig(inputPath: String, outputPath: String)
 object AppConfig {
   val descriptor: ConfigDescriptor[String, String, AppConfig] =
     (
-      string("INPUT_PATH") |@|
-        string("OUTPUT_PATH")
+      string("LPTEMPLATEENVPREFIX_INPUT_PATH") |@|
+        string("LPTEMPLATEENVPREFIX_OUTPUT_PATH")
     )(AppConfig.apply, AppConfig.unapply)
 }

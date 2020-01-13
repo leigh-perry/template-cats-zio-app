@@ -7,6 +7,7 @@ val Scala_212 = "2.12.10"
 ////
 
 val projectName = "lptemplatedivision-lptemplateprojectname"
+val organisationName = "Lptemplatecompany"
 
 //inThisBuild(
 //  List(
@@ -53,6 +54,7 @@ lazy val commonSettings =
     fork in Test := true,
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
     name := projectName,
+    organization := organisationName,
     updateOptions := updateOptions.value.withGigahorse(false),
     libraryDependencies ++=
       Seq(
@@ -115,6 +117,7 @@ lazy val root =
     .settings(commonSettings)
     .settings(skip in publish := true, crossScalaVersions := List())
     .aggregate((allModules).map(x => x: ProjectReference): _*)
+    //.enablePlugins(sbtdocker.DockerPlugin)
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("fmtcheck", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
@@ -158,3 +161,61 @@ def commonScalacOptions(scalaVersion: String) =
     versionDependentExtraScalacOptions(scalaVersion)
 
 val testDependencies = "compile->compile;test->test"
+
+////
+
+//dockerfile in docker := {
+//  // The assembly task generates a fat JAR file
+//  val artifact: File = assembly.value
+//  val artifactTargetPath = s"/app/${artifact.name}"
+//
+//  new Dockerfile {
+//    from("openjdk:11-jre-slim")
+//    add(artifact, artifactTargetPath)
+//    entryPoint("java", "-jar", artifactTargetPath)
+//  }
+//}
+//
+//buildOptions in docker := BuildOptions(cache = false)
+
+// Prevent clash in sbt assembly
+assemblyExcludedJars in assembly := {
+  val cp = (fullClasspath in assembly).value
+  cp.filter(_.data.getName.contains("log4j"))
+}
+
+assemblyMergeStrategy in assembly := {
+  case PathList(ps @ _*) if ps.exists(_.contains("maven.properties")) => MergeStrategy.first
+  case PathList(ps @ _*) if ps.exists(_.contains("META-INF/MANIFEST.MF")) => MergeStrategy.first
+  case PathList(ps @ _*) if ps.exists(_.contains("slf4j")) => MergeStrategy.first
+  case x =>
+    val oldStrategy = (assemblyMergeStrategy in assembly).value
+    oldStrategy(x)
+}
+
+// Create assembly only for top level project
+aggregate in assembly := false
+
+// support docker task ("sbt docker" command)
+enablePlugins(DockerPlugin)
+
+dockerfile in docker := {
+  // The assembly task generates a fat JAR file
+  val artifact: File = assembly.value
+  val artifactTargetPath = s"/app/${artifact.name}"
+
+  new Dockerfile {
+    from("openjdk:11-jre-slim")
+    add(new File("docker-components/run_app.sh"), "/app/run_app.sh")
+    add(artifact, artifactTargetPath)
+    entryPoint("/app/run_app.sh", artifactTargetPath)
+  }
+}
+
+buildOptions in docker := BuildOptions(cache = false)
+
+imageNames in docker :=
+  Seq(
+    // Sets the latest tag
+    ImageName(s"${organization.value}/${projectName}:latest")
+  )
