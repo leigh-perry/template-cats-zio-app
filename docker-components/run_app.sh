@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # This runs inside the application docker container, all at /app
+
 JAR_FILE=$1
 #GLOBAL_SWITCHES="--add-modules java.xml.bind"
 GLOBAL_SWITCHES=
