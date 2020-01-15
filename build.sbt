@@ -7,7 +7,7 @@ val Scala_212 = "2.12.10"
 ////
 
 val projectName = "lptemplatedivision-lptemplateprojectname"
-val organisationName = "Lptemplatecompany"
+val organisationName = "lptemplatecompany"
 
 //inThisBuild(
 //  List(
