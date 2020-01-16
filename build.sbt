@@ -60,7 +60,19 @@ lazy val commonSettings =
       Seq(
         zioTest % Test,
         zioTestSbt % Test
-      ) ++ compilerPlugins
+      ) ++ compilerPlugins,
+    //test in assembly := {},
+    //assemblyJarName in assembly := assemblyJar,
+    assemblyMergeStrategy in assembly := {
+      case x @ _ =>
+        if (x.toString.contains("zio/BuildInfo$.class")) {
+          println(s"*** discarding `$x`")
+          MergeStrategy.discard
+        } else {
+          val oldStrategy = (assemblyMergeStrategy in assembly).value
+          oldStrategy(x)
+        }
+    }
   )
 
 lazy val crossBuiltCommonSettings = commonSettings ++ Seq(
@@ -165,37 +177,8 @@ val testDependencies = "compile->compile;test->test"
 
 ////
 
-//dockerfile in docker := {
-//  // The assembly task generates a fat JAR file
-//  val artifact: File = assembly.value
-//  val artifactTargetPath = s"/app/${artifact.name}"
-//
-//  new Dockerfile {
-//    from("openjdk:11-jre-slim")
-//    add(artifact, artifactTargetPath)
-//    entryPoint("java", "-jar", artifactTargetPath)
-//  }
-//}
-//
-//buildOptions in docker := BuildOptions(cache = false)
-
-// Prevent clash in sbt assembly
-assemblyExcludedJars in assembly := {
-  val cp = (fullClasspath in assembly).value
-  cp.filter(_.data.getName.contains("log4j"))
-}
-
-assemblyMergeStrategy in assembly := {
-  case PathList(ps @ _*) if ps.exists(_.contains("maven.properties")) => MergeStrategy.first
-  case PathList(ps @ _*) if ps.exists(_.contains("META-INF/MANIFEST.MF")) => MergeStrategy.first
-  case PathList(ps @ _*) if ps.exists(_.contains("slf4j")) => MergeStrategy.first
-  case x =>
-    val oldStrategy = (assemblyMergeStrategy in assembly).value
-    oldStrategy(x)
-}
-
-// Create assembly only for top level project
-aggregate in assembly := false
+// // Create assembly only for top level project
+//aggregate in assembly := false
 
 lazy val dockerSettings =
   Seq(
