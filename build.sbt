@@ -66,7 +66,6 @@ lazy val commonSettings =
     assemblyMergeStrategy in assembly := {
       case x @ _ =>
         if (x.toString.contains("zio/BuildInfo$.class")) {
-          println(s"*** discarding `$x`")
           MergeStrategy.discard
         } else {
           val oldStrategy = (assemblyMergeStrategy in assembly).value
@@ -129,6 +128,7 @@ lazy val root =
     .settings(commonSettings)
     .settings(skip in publish := true, crossScalaVersions := List())
     .aggregate(allModules.map(x => x: ProjectReference): _*)
+    .dependsOn(shared, lptemplateservicename)
     .enablePlugins(sbtdocker.DockerPlugin)
     .settings(dockerSettings)
 
@@ -178,7 +178,7 @@ val testDependencies = "compile->compile;test->test"
 ////
 
 // // Create assembly only for top level project
-//aggregate in assembly := false
+aggregate in assembly := false
 
 lazy val dockerSettings =
   Seq(

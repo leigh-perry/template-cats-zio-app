@@ -4,3 +4,5 @@ services:
     image: 'lptemplatecompany/lptemplatedivision-lptemplateprojectname'
     environment:
       LPTEMPLATEENVPREFIX_OPERATION: 'lptemplateservicename'
+      LPTEMPLATEENVPREFIX_INPUT_PATH: 'INPUT_PATH'
+      LPTEMPLATEENVPREFIX_OUTPUT_PATH: 'OUTPUT_PATH'
