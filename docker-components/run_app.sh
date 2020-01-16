@@ -15,6 +15,7 @@ env | grep LPTEMPLATEENVPREFIX_ | sort
 echo ================================================================================
 
 if [[ "$LPTEMPLATEENVPREFIX_OPERATION" == "lptemplateservicename" ]]; then
+    set -x
     exec java -cp "${JAR_FILE}" ${GLOBAL_SWITCHES} ${SCALA_SWITCHES} com.lptemplatecompany.lptemplatedivision.lptemplateservicename.AppMain
 
 else
