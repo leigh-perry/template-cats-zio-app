@@ -19,7 +19,8 @@ import zio.interop.catz._
  *
  * C = config class
  */
-class Info[C](cfg: C, log: Log.Service[Nothing, String]) extends InfoAlg[UIO] {
+class Info[C](cfg: C, log: Log.Service[Nothing, String], valueTransform: ((String, String)) => String)
+  extends InfoAlg[UIO] {
 
   import scala.collection.JavaConverters._
 
@@ -66,11 +67,22 @@ class Info[C](cfg: C, log: Log.Service[Nothing, String]) extends InfoAlg[UIO] {
     "================================================================================"
 
   private def formatMapEntry(e: (String, String)): String =
-    s"${e._1}=${Apps.loggable(e._2)}"
+    s"${e._1}=${valueTransform((e._1, Apps.loggable(e._2)))}"
 }
 
 object Info {
-  def of[F[_]: Monad, C](cfg: C, log: Log.Service[Nothing, String]): F[Info[C]] =
-    new Info(cfg, log)
+  def of[F[_]: Monad, C](
+    cfg: C,
+    log: Log.Service[Nothing, String],
+    valueTransform: ((String, String)) => String
+  ): F[Info[C]] =
+    new Info(cfg, log, valueTransform)
       .pure[F]
+
+  def keyBasedObfuscation(prohibited: List[String]): ((String, String)) => String = {
+    case (key, value) =>
+      if (prohibited.exists(s => key.toLowerCase.contains(s.toLowerCase))) "********"
+      else value
+  }
+
 }

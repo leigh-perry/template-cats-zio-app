@@ -6,7 +6,7 @@ import com.leighperry.log4zio.Log.SafeLog
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.AppConfig
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import zio.blocking.Blocking
-import zio.config.{ config, Config }
+import zio.config.Config
 import zio.{ App, UIO, ZEnv, ZIO }
 
 object AppMain extends App {
@@ -129,7 +129,7 @@ object Application {
     for {
       log <- stringLog
       cfg <- zio.config.config[AppConfig]
-      info <- Info.of[UIO, AppConfig](cfg, log)
+      info <- Info.of[UIO, AppConfig](cfg, log, Info.keyBasedObfuscation(List("password", "credential")))
       _ <- info.logEnvironment
       _ <- logProgramConfig
       _ <- runSparkJob
