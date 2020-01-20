@@ -65,9 +65,10 @@ lazy val commonSettings =
     //assemblyJarName in assembly := assemblyJar,
     assemblyMergeStrategy in assembly := {
       case x @ _ =>
-        if (x.toString.contains("zio/BuildInfo$.class")) {
+        val blacklist = List("zio/BuildInfo$.class", "module-info.class")
+        if (blacklist.exists(x.toString.contains(_)))
           MergeStrategy.discard
-        } else {
+        else {
           val oldStrategy = (assemblyMergeStrategy in assembly).value
           oldStrategy(x)
         }
