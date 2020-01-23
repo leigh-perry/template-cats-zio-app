@@ -60,7 +60,7 @@ trait Spark {
 
 object Spark {
   trait Service {
-    def sparkSession: UIO[SparkSession]
+    def sparkSession: SparkSession
   }
 
   def make(session: => SparkSession): ZIO[Blocking, Throwable, Spark] =
@@ -72,8 +72,8 @@ object Spark {
           new Spark {
             override def spark: Service =
               new Service {
-                override def sparkSession: UIO[SparkSession] =
-                  ZIO.succeed(session)
+                override def sparkSession: SparkSession =
+                  session
               }
           }
       )
@@ -109,7 +109,7 @@ object Application {
   val runSparkJob: ZIO[Spark with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
       log <- stringLog
-      spark <- ZIO.accessM[Spark](_.spark.sparkSession)
+      spark <- ZIO.access[Spark](_.spark.sparkSession)
       _ <- log.info(s"Executing something with spark ${spark.version}")
       result <- zio.blocking.effectBlocking(spark.slowOp("SELECT something"))
       _ <- log.info(s"Executed something with spark ${spark.version}: $result")
@@ -119,7 +119,7 @@ object Application {
     for {
       log <- stringLog
       cfg <- zio.config.config[AppConfig]
-      spark <- ZIO.accessM[Spark](_.spark.sparkSession)
+      spark <- ZIO.access[Spark](_.spark.sparkSession)
       _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.version}")
     } yield ()
 
