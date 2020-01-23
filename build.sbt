@@ -87,7 +87,7 @@ lazy val shared =
           cats,
           catsEffect,
           zio,
-          ziocats,
+          zioCats,
           logback,
           zioConfig
         )
