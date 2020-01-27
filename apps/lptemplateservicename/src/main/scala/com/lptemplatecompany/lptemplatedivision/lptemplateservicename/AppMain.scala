@@ -135,6 +135,4 @@ object Application {
       _ <- runSparkJob
       _ <- processData
     } yield ()
-
-  val cores: Int = Runtime.getRuntime.availableProcessors
 }
