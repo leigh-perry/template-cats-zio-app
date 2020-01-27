@@ -61,7 +61,12 @@ class Info[C](cfg: C, log: Log.Service[Nothing, String], valueTransform: ((Strin
        |  gitCommitDate         : ${BuildInfo.gitCommitDate}
        |  gitMessage            : ${Apps.loggable(BuildInfo.gitMessage.trim)}
        |  gitUncommittedChanges : ${BuildInfo.gitUncommittedChanges}
-       |  library-dependencies  : ${BuildInfo.libraryDependencies}""".stripMargin
+       |  library-dependencies  : ${BuildInfo.libraryDependencies}
+       |  JVM version           : ${Runtime.version}
+       |  availableProcessors   : ${Runtime.getRuntime.availableProcessors}
+       |  maxMemory             : ${Runtime.getRuntime.maxMemory}
+       |  totalMemory           : ${Runtime.getRuntime.totalMemory}
+       |  freeMemory            : ${Runtime.getRuntime.freeMemory}""".stripMargin
 
   private val separator =
     "================================================================================"
