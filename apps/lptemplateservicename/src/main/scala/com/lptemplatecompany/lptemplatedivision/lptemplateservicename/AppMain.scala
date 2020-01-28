@@ -7,7 +7,7 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.App
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import zio.blocking.Blocking
 import zio.config.Config
-import zio.{ App, UIO, ZEnv, ZIO }
+import zio.{App, UIO, ZEnv, ZIO}
 
 object AppMain extends App {
 
