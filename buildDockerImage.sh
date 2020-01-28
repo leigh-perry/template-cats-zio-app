@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 PACK_FOLDER=target/pack
 APP_FOLDER=appjars
 

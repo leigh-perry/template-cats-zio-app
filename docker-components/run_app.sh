@@ -8,7 +8,6 @@ JVM_SWITCHES="-XshowSettings:vm -XX:+UnlockExperimentalVMOptions -XX:+UseContain
 SCALA_SWITCHES="-Dscala.concurrent.context.minThreads=4 -Dscala.concurrent.context.numThreads=x4 -Dscala.concurrent.context.maxThreads=64"
 JAVA_BASE_COMMAND="java -cp $(printf ":%s" lib/*.jar | cut -c2-) ${JVM_SWITCHES} ${SCALA_SWITCHES}"
 
-echo JAR_FILE=${JAR_FILE}
 echo ================================================================================
 ls -lR /app
 echo ================================================================================
