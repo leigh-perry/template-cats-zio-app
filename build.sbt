@@ -60,19 +60,7 @@ lazy val commonSettings =
       Seq(
         zioTest % Test,
         zioTestSbt % Test
-      ) ++ compilerPlugins,
-    //test in assembly := {},
-    //assemblyJarName in assembly := assemblyJar,
-    assemblyMergeStrategy in assembly := {
-      case x @ _ =>
-        val blacklist = List("zio/BuildInfo$.class", "module-info.class")
-        if (blacklist.exists(x.toString.contains(_)))
-          MergeStrategy.discard
-        else {
-          val oldStrategy = (assemblyMergeStrategy in assembly).value
-          oldStrategy(x)
-        }
-    }
+      ) ++ compilerPlugins
   )
 
 lazy val crossBuiltCommonSettings = commonSettings ++ Seq(
@@ -119,7 +107,6 @@ lazy val lptemplateservicename =
           log4zio
         )
     )
-    .enablePlugins(BuildInfoPlugin)
 
 lazy val allModules = List(shared, lptemplateservicename)
 
@@ -129,9 +116,8 @@ lazy val root =
     .settings(commonSettings)
     .settings(skip in publish := true, crossScalaVersions := List())
     .aggregate(allModules.map(x => x: ProjectReference): _*)
-    .dependsOn(shared, lptemplateservicename)
-    .enablePlugins(sbtdocker.DockerPlugin)
-    .settings(dockerSettings)
+    .dependsOn(allModules.map(x => x: ClasspathDep[ProjectReference]): _*)
+    .enablePlugins(PackPlugin)
 
 addCommandAlias("fmt", "all scalafmtSbt scalafmt test:scalafmt")
 addCommandAlias("fmtcheck", "all scalafmtSbtCheck scalafmtCheck test:scalafmtCheck")
@@ -175,35 +161,3 @@ def commonScalacOptions(scalaVersion: String) =
     versionDependentExtraScalacOptions(scalaVersion)
 
 val testDependencies = "compile->compile;test->test"
-
-////
-
-// // Create assembly only for top level project
-aggregate in assembly := false
-
-lazy val dockerSettings =
-  Seq(
-    dockerfile in docker := {
-      // The assembly task generates a fat JAR file
-      val artifact: File = assembly.value
-      val artifactTargetPath = s"/app/${artifact.name}"
-
-      new Dockerfile {
-        from("openjdk:11-jre-slim")
-        add(new File("docker-components/run_app.sh"), "/app/run_app.sh")
-        add(artifact, artifactTargetPath)
-        entryPoint("/app/run_app.sh", artifactTargetPath)
-      }
-    },
-    buildOptions in docker := BuildOptions(cache = false),
-    imageNames in docker :=
-      Seq(
-        // Sets the latest tag
-        ImageName(s"${organization.value}/$projectName:latest"),
-        // Sets a name with a tag that contains the project version
-        ImageName(
-          repository = name.value,
-          tag = Some(s"v${version.value}")
-        )
-      )
-  )
