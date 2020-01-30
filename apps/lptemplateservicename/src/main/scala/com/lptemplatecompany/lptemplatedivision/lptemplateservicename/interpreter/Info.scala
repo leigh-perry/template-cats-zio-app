@@ -19,7 +19,7 @@ import zio.interop.catz._
  *
  * C = config class
  */
-class Info[C](cfg: C, log: Log.Service[Nothing, String], valueTransform: ((String, String)) => String)
+class Info[C] private (cfg: C, log: Log.Service[Nothing, String], valueTransform: ((String, String)) => String)
   extends InfoAlg[UIO] {
 
   import scala.collection.JavaConverters._
