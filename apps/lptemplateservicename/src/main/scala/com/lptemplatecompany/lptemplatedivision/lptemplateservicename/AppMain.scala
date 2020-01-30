@@ -30,7 +30,7 @@ object AppMain extends App {
       pgm = for {
         config <- Config.fromEnv(AppConfig.descriptor, None)
         spark <- Spark.local(appName)
-        _ <- Application.execute.provide(AppEnv(log, config.config, spark.spark))
+        _ <- Application.program.provide(AppEnv(log, config.config, spark.spark))
       } yield ()
 
       exitCode <- pgm.foldM(
@@ -125,7 +125,7 @@ object Application {
 
   import zio.interop.catz._
 
-  val execute: ZIO[Spark with Config[AppConfig] with SafeLog[String] with Blocking, Throwable, Unit] =
+  val program: ZIO[Spark with Config[AppConfig] with SafeLog[String] with Blocking, Throwable, Unit] =
     for {
       log <- stringLog
       cfg <- zio.config.config[AppConfig]
