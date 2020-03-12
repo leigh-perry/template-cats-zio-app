@@ -5,37 +5,32 @@ import com.leighperry.log4zio.Log
 import com.leighperry.log4zio.Log.SafeLog
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.AppConfig
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
-import zio.blocking.Blocking
+import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import zio.config.Config
-import zio.{App, UIO, ZEnv, ZIO}
+import zio.{ App, IO, UIO, ZEnv, ZIO }
 
 object AppMain extends App {
-
-  final case class AppEnv(
-    log: Log.Service[Nothing, String],
-    config: Config.Service[AppConfig],
-    spark: Spark.Service
-  ) extends SafeLog[String]
-    with Spark
-    with Config[AppConfig]
-    with Blocking.Live
 
   val appName = "LPTEMPLATESERVICENAME"
 
   override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
     for {
-      logsvc <- Log.console[String](appName.some)
-      log = logsvc.log
+      log <- Log.console[String](appName.some)
 
       pgm = for {
-        config <- Config.fromEnv(AppConfig.descriptor, None)
+        config <- ZIO
+          .environment
+          .provideLayer(Config.fromEnv(AppConfig.descriptor, None))
+          .mapError(AppError.InvalidConfiguration)
+
+        cfg = config.get.config
         spark <- Spark.local(appName)
-        _ <- Application.program.provide(AppEnv(log, config.config, spark.spark))
+        _ <- new Application(cfg, log, spark).program
       } yield ()
 
       exitCode <- pgm.foldM(
-        e => log.error(s"Application failed: $e") *> ZIO.succeed(1),
-        _ => log.info("Application terminated with no error indication") *> ZIO.succeed(0)
+        e => log.error(s"Application failed: $e") *> IO.succeed(1),
+        _ => log.info("Application terminated with no error indication") *> IO.succeed(0)
       )
 
     } yield exitCode
@@ -55,37 +50,29 @@ final case class SparkSession(name: String) {
 ////
 
 trait Spark {
-  def spark: Spark.Service
+  def sparkSession: SparkSession
 }
 
 object Spark {
-  trait Service {
-    def sparkSession: SparkSession
-  }
-
-  def make(session: => SparkSession): ZIO[Blocking, Throwable, Spark] =
-    zio
-      .blocking
-      .effectBlocking(session)
+  def make(session: => SparkSession): IO[Throwable, Spark] =
+    Apps
+      .effectBlock(session)
       .map(
         session =>
           new Spark {
-            override def spark: Service =
-              new Service {
-                override def sparkSession: SparkSession =
-                  session
-              }
+            override def sparkSession: SparkSession =
+              session
           }
       )
 
-  def local(name: String): ZIO[Blocking, Throwable, Spark] =
+  def local(name: String): IO[Throwable, Spark] =
     make {
       // As a real-world example:
       //    SparkSession.builder().appName(name).master("local").getOrCreate()
       SparkSession(name)
     }
 
-  def cluster(name: String): ZIO[Blocking, Throwable, Spark] =
+  def cluster(name: String): IO[Throwable, Spark] =
     make {
       // As a real-world example:
       //    SparkSession.builder().appName(name).enableHiveSupport().getOrCreate()
@@ -96,39 +83,26 @@ object Spark {
 ////
 
 // The core application
-object Application {
-  import Log.stringLog
+class Application(cfg: AppConfig, log: SafeLog[String], spark: Spark) {
+  val logProgramConfig: IO[Nothing, Unit] =
+    log.info(s"Executing parameters ${cfg.inputPath} and ${cfg.outputPath} without sparkSession")
 
-  val logProgramConfig: ZIO[Config[AppConfig] with SafeLog[String], Nothing, Unit] =
+  val runSparkJob: IO[Throwable, Unit] =
     for {
-      log <- stringLog
-      cfg <- zio.config.config[AppConfig]
-      _ <- log.info(s"Executing parameters ${cfg.inputPath} and ${cfg.outputPath} without sparkSession")
+      _ <- log.info(s"Executing something with spark ${spark.sparkSession.version}")
+      result <- Apps.effectBlock(spark.sparkSession.slowOp("SELECT something"))
+      _ <- log.info(s"Executed something with spark ${spark.sparkSession.version}: $result")
     } yield ()
 
-  val runSparkJob: ZIO[Spark with SafeLog[String] with Blocking, Throwable, Unit] =
+  val processData: IO[Throwable, Unit] =
     for {
-      log <- stringLog
-      spark <- ZIO.access[Spark](_.spark.sparkSession)
-      _ <- log.info(s"Executing something with spark ${spark.version}")
-      result <- zio.blocking.effectBlocking(spark.slowOp("SELECT something"))
-      _ <- log.info(s"Executed something with spark ${spark.version}: $result")
-    } yield ()
-
-  val processData: ZIO[Spark with Config[AppConfig] with SafeLog[String], Throwable, Unit] =
-    for {
-      log <- stringLog
-      cfg <- zio.config.config[AppConfig]
-      spark <- ZIO.access[Spark](_.spark.sparkSession)
-      _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.version}")
+      _ <- log.info(s"Executing ${cfg.inputPath} and ${cfg.outputPath} using ${spark.sparkSession.version}")
     } yield ()
 
   import zio.interop.catz._
 
-  val program: ZIO[Spark with Config[AppConfig] with SafeLog[String] with Blocking, Throwable, Unit] =
+  val program: IO[Throwable, Unit] =
     for {
-      log <- stringLog
-      cfg <- zio.config.config[AppConfig]
       info <- Info.of[UIO, AppConfig](cfg, log, Info.keyBasedObfuscation(List("password", "credential")))
       _ <- info.logEnvironment
       _ <- logProgramConfig

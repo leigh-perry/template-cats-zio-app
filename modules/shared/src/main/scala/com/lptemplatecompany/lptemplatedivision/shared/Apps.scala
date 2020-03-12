@@ -2,7 +2,22 @@ package com.lptemplatecompany.lptemplatedivision.shared
 
 import java.io.{ PrintWriter, StringWriter }
 
+import zio.blocking.Blocking
+import zio.{ IO, ZIO }
+
 object Apps {
+  private val blocker: IO[Nothing, Blocking] =
+    ZIO.environment.provideLayer(zio.blocking.Blocking.live)
+
+  def block[E, A](io: IO[E, A]): IO[E, A] =
+    blocker.flatMap {
+      _.get.blocking(io)
+    }
+
+  def effectBlock[E, A](effect: => A): IO[Throwable, A] =
+    blocker.flatMap {
+      _.get.effectBlocking(effect)
+    }
 
   def className(o: AnyRef): String =
     o.getClass.getSimpleName.replaceAll("\\$", "")

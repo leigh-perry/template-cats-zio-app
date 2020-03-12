@@ -19,7 +19,7 @@ import zio.interop.catz._
  *
  * C = config class
  */
-class Info[C] private (cfg: C, log: Log.Service[Nothing, String], valueTransform: ((String, String)) => String)
+class Info[C] private (cfg: C, log: Log[Nothing, String], valueTransform: ((String, String)) => String)
   extends InfoAlg[UIO] {
 
   import scala.collection.JavaConverters._
@@ -78,7 +78,7 @@ class Info[C] private (cfg: C, log: Log.Service[Nothing, String], valueTransform
 object Info {
   def of[F[_]: Monad, C](
     cfg: C,
-    log: Log.Service[Nothing, String],
+    log: Log[Nothing, String],
     valueTransform: ((String, String)) => String
   ): F[Info[C]] =
     new Info(cfg, log, valueTransform)
