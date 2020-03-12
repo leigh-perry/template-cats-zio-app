@@ -18,9 +18,8 @@ object AppMain extends App {
       log <- Log.console[String](appName.some)
 
       pgm = for {
-        config <- ZIO
-          .environment
-          .provideLayer(Config.fromEnv(AppConfig.descriptor, None))
+        config <- Apps
+          .toIO(Config.fromEnv(AppConfig.descriptor, None))
           .mapError(AppError.InvalidConfiguration)
 
         cfg = config.get.config

@@ -3,11 +3,14 @@ package com.lptemplatecompany.lptemplatedivision.shared
 import java.io.{ PrintWriter, StringWriter }
 
 import zio.blocking.Blocking
-import zio.{ IO, ZIO }
+import zio.{ Has, IO, ZIO, ZLayer }
 
 object Apps {
   private val blocker: IO[Nothing, Blocking] =
-    ZIO.environment.provideLayer(zio.blocking.Blocking.live)
+    toIO(Blocking.live)
+
+  def toIO[E, A <: Has[_]](layer: ZLayer[Any, E, A]): IO[E, A] =
+    ZIO.environment.provideLayer[E, Any, A](layer)
 
   def block[E, A](io: IO[E, A]): IO[E, A] =
     blocker.flatMap {

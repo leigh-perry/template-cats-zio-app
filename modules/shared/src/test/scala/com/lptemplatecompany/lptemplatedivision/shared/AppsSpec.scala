@@ -8,7 +8,7 @@ object AppsSpec extends DefaultRunnableSpec {
   def spec: Spec[TestEnvironment, TestFailure[Nothing], TestSuccess] =
     suite("Apps")(
       test("className") {
-        assert(Apps.className(Apps), equalTo("Apps"))
+        assert(Apps.className(Apps))(equalTo("Apps"))
       }
     )
 }
