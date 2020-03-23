@@ -1,4 +1,4 @@
-# Build using b/buildDockerImage.sh
+# Build using ./buildDockerImage.sh
 
 FROM openjdk:11-jre-slim
 
