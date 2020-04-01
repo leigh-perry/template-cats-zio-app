@@ -55,7 +55,7 @@ trait Spark {
 object Spark {
   def make(session: => SparkSession): IO[Throwable, Spark] =
     Apps
-      .effectBlock(session)
+      .effectBlocking(session)
       .map(
         session =>
           new Spark {
@@ -89,7 +89,7 @@ class Application(cfg: AppConfig, log: SafeLog[String], spark: Spark) {
   val runSparkJob: IO[Throwable, Unit] =
     for {
       _ <- log.info(s"Executing something with spark ${spark.sparkSession.version}")
-      result <- Apps.effectBlock(spark.sparkSession.slowOp("SELECT something"))
+      result <- Apps.effectBlocking(spark.sparkSession.slowOp("SELECT something"))
       _ <- log.info(s"Executed something with spark ${spark.sparkSession.version}: $result")
     } yield ()
 

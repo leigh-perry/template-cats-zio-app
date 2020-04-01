@@ -12,15 +12,20 @@ object Apps {
   def toIO[E, A <: Has[_]](layer: ZLayer[Any, E, A]): IO[E, A] =
     ZIO.environment.provideLayer[E, Any, A](layer)
 
-  def block[E, A](io: IO[E, A]): IO[E, A] =
+  def blocking[E, A](io: IO[E, A]): IO[E, A] =
     blocker.flatMap {
       _.get.blocking(io)
     }
 
-  def effectBlock[E, A](effect: => A): IO[Throwable, A] =
+  def effectBlocking[E, A](effect: => A): IO[Throwable, A] =
     blocker.flatMap {
       _.get.effectBlocking(effect)
     }
+
+  def effectBlocking[E, A](effect: => A, fe: Throwable => E): IO[E, A] =
+    blocker.flatMap {
+      _.get.effectBlocking(effect)
+    }.mapError(fe)
 
   def className(o: AnyRef): String =
     o.getClass.getSimpleName.replaceAll("\\$", "")
