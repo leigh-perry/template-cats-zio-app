@@ -19,10 +19,10 @@ object AppMain extends App {
 
       pgm = for {
         config <- Apps
-          .toIO(Config.fromEnv(AppConfig.descriptor, None))
+          .toIO(Config.fromSystemEnv(AppConfig.descriptor))
           .mapError(AppError.InvalidConfiguration)
 
-        cfg = config.get.config
+        cfg = config.get
         spark <- Spark.local(appName)
         _ <- new Application(cfg, log, spark).program
       } yield ()
