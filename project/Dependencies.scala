@@ -6,6 +6,7 @@ object Dependencies {
 
     val cats = "2.1.1"
     val catsEffect = "2.1.2"
+    val catsMouse = "0.24"
 
     val zio = "1.0.0-RC18-2"
     val zioConfig = "1.0.0-RC14"
@@ -17,6 +18,7 @@ object Dependencies {
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
   val catsEffect = "org.typelevel" %% "cats-effect" % Version.catsEffect
+  val catsMouse = "org.typelevel" %% "mouse" % Version.catsMouse
 
   val zio = "dev.zio" %% "zio" % Version.zio
   val zioConfig = "dev.zio" %% "zio-config" % Version.zioConfig
