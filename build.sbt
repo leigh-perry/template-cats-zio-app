@@ -74,6 +74,7 @@ lazy val shared =
         Seq(
           cats,
           catsEffect,
+          catsMouse,
           zio,
           zioCats,
           logback,
