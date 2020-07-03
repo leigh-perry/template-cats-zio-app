@@ -7,13 +7,13 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.App
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import zio.config.Config
-import zio.{ App, IO, UIO, ZEnv, ZIO }
+import zio.{App, ExitCode, IO, UIO, ZEnv, ZIO}
 
 object AppMain extends App {
 
   val appName = "LPTEMPLATESERVICENAME"
 
-  override def run(args: List[String]): ZIO[ZEnv, Nothing, Int] =
+  override def run(args: List[String]): ZIO[ZEnv, Nothing, ExitCode] =
     for {
       log <- Log.console[String](appName.some)
 
@@ -28,8 +28,8 @@ object AppMain extends App {
       } yield ()
 
       exitCode <- pgm.foldM(
-        e => log.error(s"Application failed: $e") *> IO.succeed(1),
-        _ => log.info("Application terminated with no error indication") *> IO.succeed(0)
+        e => log.error(s"Application failed: $e") *> IO.succeed(ExitCode.failure),
+        _ => log.info("Application terminated with no error indication") *> IO.succeed(ExitCode.success)
       )
 
     } yield exitCode

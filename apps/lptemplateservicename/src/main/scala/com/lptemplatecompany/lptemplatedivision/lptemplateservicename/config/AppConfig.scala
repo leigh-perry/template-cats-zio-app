@@ -9,7 +9,7 @@ import zio.config._
 final case class AppConfig(inputPath: String, outputPath: String)
 
 object AppConfig {
-  val descriptor: ConfigDescriptor[String, String, AppConfig] =
+  val descriptor: ConfigDescriptor[AppConfig] =
     (
       string("LPTEMPLATEENVPREFIX_INPUT_PATH") |@|
         string("LPTEMPLATEENVPREFIX_OUTPUT_PATH")
