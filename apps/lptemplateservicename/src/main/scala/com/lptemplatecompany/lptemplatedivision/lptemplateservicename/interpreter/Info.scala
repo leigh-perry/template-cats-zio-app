@@ -22,7 +22,8 @@ import zio.interop.catz._
 class Info[C] private (cfg: C, log: Log[Nothing, String], valueTransform: ((String, String)) => String)
   extends InfoAlg[UIO] {
 
-  import scala.collection.JavaConverters._
+  //import scala.collection.JavaConverters._    // <= 2.12
+  import scala.jdk.CollectionConverters._
 
   override def systemProperties: UIO[Map[String, String]] =
     System.getProperties.asScala.toMap.pure[UIO]

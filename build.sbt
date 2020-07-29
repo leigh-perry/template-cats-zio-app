@@ -51,6 +51,21 @@ lazy val commonSettings =
   Seq(
     scalaVersion := Scala_213,
     scalacOptions ++= commonScalacOptions(scalaVersion.value),
+    scalacOptions in Compile ++= Seq(
+      "-Wconf:any:warning-verbose",
+      "-Wunused:nowarn"
+    ), // https://www.inner-product.com/posts/nowarn-addendum/
+    scalacOptions in Compile ~= {
+      options: Seq[String] =>
+        options.filterNot(
+          Set(
+            "-Wunused:imports",
+            //"-Wunused:locals",
+            //-"Wunused:params",
+            "-Wunused:privates"
+          )
+        )
+    },
     fork in Test := true,
     testFrameworks := Seq(new TestFramework("zio.test.sbt.ZTestFramework")),
     name := projectName,
@@ -143,22 +158,6 @@ def versionDependentExtraScalacOptions(scalaVersion: String) =
   }
 
 def commonScalacOptions(scalaVersion: String) =
-  Seq(
-    "-encoding",
-    "UTF-8",
-    "-feature",
-    "-language:existentials",
-    "-language:higherKinds",
-    "-language:implicitConversions",
-    "-language:experimental.macros",
-    "-unchecked",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard",
-    //"-Xfatal-warnings",
-    "-deprecation",
-    "-Xlint:-unused,_"
-  ) ++
-    versionDependentExtraScalacOptions(scalaVersion)
+  versionDependentExtraScalacOptions(scalaVersion)
 
 val testDependencies = "compile->compile;test->test"
