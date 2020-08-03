@@ -7,7 +7,7 @@ import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.App
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
 import zio.config.Config
-import zio.{App, ExitCode, IO, UIO, ZEnv, ZIO}
+import zio.{ App, ExitCode, IO, UIO, ZEnv, ZIO }
 
 object AppMain extends App {
 
@@ -18,9 +18,10 @@ object AppMain extends App {
       log <- Log.console[String](appName.some)
 
       pgm = for {
-        config <- Apps
-          .toIO(Config.fromSystemEnv(AppConfig.descriptor))
-          .mapError(AppError.InvalidConfiguration)
+        config <-
+          Apps
+            .toIO(Config.fromSystemEnv(AppConfig.descriptor))
+            .mapError(AppError.InvalidConfiguration)
 
         cfg = config.get
         spark <- Spark.local(appName)

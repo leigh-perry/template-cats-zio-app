@@ -37,9 +37,8 @@ lazy val gitCommitAuthor: String = {
   if (status == 0) {
     val trimmed = s.trim
     if (trimmed.length == 0) "(none)" else trimmed
-  } else {
+  } else
     "(error retrieving git commit author)"
-  }
 }
 
 lazy val compilerPlugins =
