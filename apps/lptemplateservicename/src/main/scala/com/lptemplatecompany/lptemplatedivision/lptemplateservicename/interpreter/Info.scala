@@ -22,7 +22,8 @@ import zio.interop.catz._
 class Info[C] private (cfg: C, log: Log[Nothing, String], valueTransform: ((String, String)) => String)
   extends InfoAlg[UIO] {
 
-  import scala.collection.JavaConverters._
+  //import scala.collection.JavaConverters._    // <= 2.12
+  import scala.jdk.CollectionConverters._
 
   override def systemProperties: UIO[Map[String, String]] =
     System.getProperties.asScala.toMap.pure[UIO]
@@ -50,23 +51,23 @@ class Info[C] private (cfg: C, log: Log[Nothing, String], valueTransform: ((Stri
 
   private val banner =
     s"""${Apps.className(this)} process version: ${BuildInfo.version}
-       |  scala-version         : ${BuildInfo.scalaVersion}
-       |  sbt-version           : ${BuildInfo.sbtVersion}
-       |  build-time            : ${BuildInfo.buildTime}
-       |  git-commit            : ${BuildInfo.gitCommitIdentifier}
-       |  gitCommitIdentifier   : ${BuildInfo.gitCommitIdentifier}
-       |  gitHashShort          : ${BuildInfo.gitHashShort}
-       |  gitBranch             : ${BuildInfo.gitBranch}
-       |  gitCommitAuthor       : ${BuildInfo.gitCommitAuthor.replaceAll("/", " - ")}
-       |  gitCommitDate         : ${BuildInfo.gitCommitDate}
-       |  gitMessage            : ${Apps.loggable(BuildInfo.gitMessage.trim)}
-       |  gitUncommittedChanges : ${BuildInfo.gitUncommittedChanges}
-       |  library-dependencies  : ${BuildInfo.libraryDependencies}
-       |  JVM version           : ${Runtime.version}
-       |  availableProcessors   : ${Runtime.getRuntime.availableProcessors}
-       |  maxMemory             : ${Runtime.getRuntime.maxMemory}
-       |  totalMemory           : ${Runtime.getRuntime.totalMemory}
-       |  freeMemory            : ${Runtime.getRuntime.freeMemory}""".stripMargin
+      |  scala-version         : ${BuildInfo.scalaVersion}
+      |  sbt-version           : ${BuildInfo.sbtVersion}
+      |  build-time            : ${BuildInfo.buildTime}
+      |  git-commit            : ${BuildInfo.gitCommitIdentifier}
+      |  gitCommitIdentifier   : ${BuildInfo.gitCommitIdentifier}
+      |  gitHashShort          : ${BuildInfo.gitHashShort}
+      |  gitBranch             : ${BuildInfo.gitBranch}
+      |  gitCommitAuthor       : ${BuildInfo.gitCommitAuthor.replaceAll("/", " - ")}
+      |  gitCommitDate         : ${BuildInfo.gitCommitDate}
+      |  gitMessage            : ${Apps.loggable(BuildInfo.gitMessage.trim)}
+      |  gitUncommittedChanges : ${BuildInfo.gitUncommittedChanges}
+      |  library-dependencies  : ${BuildInfo.libraryDependencies}
+      |  JVM version           : ${Runtime.version}
+      |  availableProcessors   : ${Runtime.getRuntime.availableProcessors}
+      |  maxMemory             : ${Runtime.getRuntime.maxMemory}
+      |  totalMemory           : ${Runtime.getRuntime.totalMemory}
+      |  freeMemory            : ${Runtime.getRuntime.freeMemory}""".stripMargin
 
   private val separator =
     "================================================================================"
