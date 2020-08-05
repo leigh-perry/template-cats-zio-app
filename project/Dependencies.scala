@@ -10,7 +10,7 @@ object Dependencies {
 
     val zio = "1.0.0"
     val zioConfig = "1.0.0-RC26"
-    val zioCats = "2.1.3.0-RC16"
+    val zioCats = "2.1.4.0"
 
     val logback = "1.2.3"
     val log4zio = "1.0.0"
