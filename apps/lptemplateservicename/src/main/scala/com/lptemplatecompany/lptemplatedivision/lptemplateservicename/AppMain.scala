@@ -6,7 +6,7 @@ import com.leighperry.log4zio.Log.SafeLog
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.config.AppConfig
 import com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter.Info
 import com.lptemplatecompany.lptemplatedivision.shared.Apps
-import zio.config.Config
+import zio.config.ZConfig
 import zio.{ App, ExitCode, IO, UIO, ZEnv, ZIO }
 
 object AppMain extends App {
@@ -20,7 +20,7 @@ object AppMain extends App {
       pgm = for {
         config <-
           Apps
-            .toIO(Config.fromSystemEnv(AppConfig.descriptor))
+            .toIO(zio.system.System.live >>> ZConfig.fromSystemEnv(AppConfig.descriptor))
             .mapError(AppError.InvalidConfiguration)
 
         cfg = config.get

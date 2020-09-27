@@ -13,7 +13,7 @@ object Dependencies {
     val zioCats = "2.1.4.0"
 
     val logback = "1.2.3"
-    val log4zio = "1.0.1"
+    val log4zio = "1.0.0"
   }
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
