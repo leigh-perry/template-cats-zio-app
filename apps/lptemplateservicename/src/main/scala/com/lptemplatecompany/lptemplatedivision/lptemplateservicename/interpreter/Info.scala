@@ -1,9 +1,6 @@
 package com.lptemplatecompany.lptemplatedivision.lptemplateservicename.interpreter
 
 import cats.Monad
-import cats.instances.list._
-import cats.instances.order._
-import cats.instances.string._
 import cats.syntax.applicative._
 import cats.syntax.traverse._
 import com.leighperry.log4zio.Log
