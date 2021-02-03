@@ -8,7 +8,7 @@ object Dependencies {
     val catsEffect = "2.3.1"
     val catsMouse = "0.26.2"
 
-    val zio = "1.0.4-1"
+    val zio = "1.0.4-2"
     val zioConfig = "1.0.0-RC32"
     val zioCats = "2.2.0.1"
 
