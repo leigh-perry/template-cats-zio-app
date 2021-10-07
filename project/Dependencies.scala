@@ -6,14 +6,14 @@ object Dependencies {
 
     val cats = "2.6.1"
     val catsEffect = "3.1.1"
-    val catsMouse = "1.0.3"
+    val catsMouse = "1.0.5"
 
-    val zio = "1.0.9"
-    val zioConfig = "1.0.6"
+    val zio = "1.0.12"
+    val zioConfig = "1.0.10"
     val zioCats = "3.1.1.0"
 
-    val logback = "1.2.3"
-    val log4zio = "1.0.6"
+    val logback = "1.2.6"
+    val log4zio = "1.0.10"
   }
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
