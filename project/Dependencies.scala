@@ -9,11 +9,11 @@ object Dependencies {
     val catsMouse = "1.0.11"
 
     val zio = "1.0.17"
-    val zioConfig = "1.0.10"
+    val zioConfig = "3.0.2"
     val zioCats = "3.1.1.0"
 
     val logback = "1.2.11"
-    val log4zio = "1.0.10"
+    val log4zio = "3.0.2"
   }
 
   val cats = "org.typelevel" %% "cats-core" % Version.cats
